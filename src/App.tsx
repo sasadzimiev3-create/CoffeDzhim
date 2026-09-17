@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
-import type { CSSProperties, FormEvent } from 'react'
+import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
   ArrowDown,
+  ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   Check,
@@ -26,54 +27,104 @@ import {
   type CatalogProduct,
 } from './data/catalog'
 
-const categories = [
+type View =
+  | 'home'
+  | 'coffee'
+  | 'tea'
+  | 'accessories'
+  | 'chemistry'
+  | 'equipment'
+  | 'service'
+  | 'contacts'
+
+const views: View[] = [
+  'home',
+  'coffee',
+  'tea',
+  'accessories',
+  'chemistry',
+  'equipment',
+  'service',
+  'contacts',
+]
+
+const navLinks: { id: View; label: string }[] = [
+  { id: 'coffee', label: 'Кофе' },
+  { id: 'chemistry', label: 'Химия' },
+  { id: 'equipment', label: 'Оборудование' },
+  { id: 'service', label: 'Сервис' },
+  { id: 'contacts', label: 'Контакты' },
+]
+
+const catalogCategories: {
+  id: View
+  number: string
+  name: string
+  count: string
+  available: boolean
+  description: string
+}[] = [
   {
     id: 'coffee',
     number: '01',
     name: 'Кофе',
-    note: 'Пять характерных профилей',
     count: '5 позиций',
+    available: true,
     description:
       'Эспрессо, фильтр и дрип-кофе с подтверждёнными профилями и актуальными вариантами фасовки.',
-    href: '#coffee',
-  },
-  {
-    id: 'tea',
-    number: '02',
-    name: 'Чай',
-    note: 'Коллекция готовится',
-    count: 'Скоро',
-    description:
-      'Раздел подготовлен для будущей коллекции листового чая и авторских купажей.',
-    href: '#tea',
-  },
-  {
-    id: 'accessories',
-    number: '03',
-    name: 'Аксессуары',
-    note: 'Ассортимент готовится',
-    count: 'Скоро',
-    description:
-      'Инструменты бариста, посуда и аксессуары для точного приготовления и подачи.',
-    href: '#accessories',
   },
   {
     id: 'chemistry',
-    number: '04',
+    number: '02',
     name: 'Химия',
-    note: 'Профессиональный уход',
     count: '4 позиции',
+    available: true,
     description:
       'Профессиональные средства для чистоты кофейных трактов, молочных систем и удаления накипи.',
-    href: '#chemistry',
+  },
+  {
+    id: 'equipment',
+    number: '03',
+    name: 'Оборудование',
+    count: '3 позиции',
+    available: true,
+    description:
+      'Эспрессо-машины, автоматические темперы и суперавтоматы для бара и кофейни.',
+  },
+  {
+    id: 'tea',
+    number: '04',
+    name: 'Чай',
+    count: 'Скоро',
+    available: false,
+    description:
+      'Раздел готовится под будущую коллекцию листового чая и авторских купажей.',
+  },
+  {
+    id: 'accessories',
+    number: '05',
+    name: 'Аксессуары',
+    count: 'Скоро',
+    available: false,
+    description:
+      'Инструменты бариста, посуда и аксессуары для точного приготовления и подачи.',
   },
 ]
+
+function getViewFromHash(): View {
+  const hash = window.location.hash.replace('#', '') as View
+  return views.includes(hash) ? hash : 'home'
+}
+
+function scrollToId(id: string) {
+  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+}
 
 function BrandLogo({ footer = false }: { footer?: boolean }) {
   return (
     <a
       className={`brand ${footer ? 'brand--footer' : ''}`}
-      href="#top"
+      href="#home"
       aria-label="CoffeDzhim.ru — на главную"
     >
       <span className="brand__mark">
@@ -84,6 +135,70 @@ function BrandLogo({ footer = false }: { footer?: boolean }) {
         CoffeDzhim<small>.ru</small>
       </span>
     </a>
+  )
+}
+
+function SiteHeader({
+  view,
+  menuOpen,
+  setMenuOpen,
+}: {
+  view: View
+  menuOpen: boolean
+  setMenuOpen: (value: boolean) => void
+}) {
+  return (
+    <header className={`site-header ${view !== 'home' ? 'site-header--solid' : ''}`}>
+      <BrandLogo />
+      <nav className="desktop-nav" aria-label="Главная навигация">
+        {navLinks.map((link) => (
+          <a
+            key={link.id}
+            href={`#${link.id}`}
+            className={view === link.id ? 'is-active' : ''}
+          >
+            {link.label}
+          </a>
+        ))}
+      </nav>
+      <a className="header-cta" href="#contacts">
+        Связаться
+        <ArrowUpRight size={15} />
+      </a>
+      <button
+        className="menu-toggle"
+        type="button"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
+        aria-expanded={menuOpen}
+      >
+        {menuOpen ? <X /> : <Menu />}
+      </button>
+    </header>
+  )
+}
+
+function PageHero({
+  eyebrow,
+  title,
+  description,
+}: {
+  eyebrow: string
+  title: ReactNode
+  description?: string
+}) {
+  return (
+    <section className="page-hero">
+      <div className="page-hero__inner" data-reveal>
+        <a className="page-back" href="#home">
+          <ArrowLeft size={14} />
+          Каталог
+        </a>
+        <p className="eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        {description && <p className="page-hero__copy">{description}</p>}
+      </div>
+    </section>
   )
 }
 
@@ -250,85 +365,14 @@ function ProductModal({
   )
 }
 
-function App() {
-  const [selectedProduct, setSelectedProduct] =
-    useState<CatalogProduct | null>(null)
-  const [activeCategory, setActiveCategory] = useState(categories[0].id)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-  const selectedCategory =
-    categories.find((category) => category.id === activeCategory) ?? categories[0]
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) entry.target.classList.add('is-visible')
-        })
-      },
-      { threshold: 0.12 },
-    )
-    const elements = document.querySelectorAll('[data-reveal]')
-    elements.forEach((element) => observer.observe(element))
-    return () => observer.disconnect()
-  }, [])
-
-  const closeMenu = () => setMenuOpen(false)
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSubmitted(true)
-  }
-
+function HomeView() {
   return (
-    <main>
-      <header className="site-header">
-        <BrandLogo />
-        <nav className="desktop-nav" aria-label="Главная навигация">
-          <a href="#production">Продукция</a>
-          <a href="#equipment">Оборудование</a>
-          <a href="#service">Сервис</a>
-          <a href="#contacts">Контакты</a>
-        </nav>
-        <a className="header-cta" href="#contacts">
-          Связаться
-          <ArrowUpRight size={15} />
-        </a>
-        <button
-          className="menu-toggle"
-          type="button"
-          onClick={() => setMenuOpen(!menuOpen)}
-          aria-label={menuOpen ? 'Закрыть меню' : 'Открыть меню'}
-          aria-expanded={menuOpen}
-        >
-          {menuOpen ? <X /> : <Menu />}
-        </button>
-      </header>
-
-      <div className={`mobile-menu ${menuOpen ? 'is-open' : ''}`}>
-        <nav aria-label="Мобильная навигация">
-          <a href="#production" onClick={closeMenu}>
-            Продукция <span>01</span>
-          </a>
-          <a href="#equipment" onClick={closeMenu}>
-            Оборудование <span>02</span>
-          </a>
-          <a href="#service" onClick={closeMenu}>
-            Сервис <span>03</span>
-          </a>
-          <a href="#contacts" onClick={closeMenu}>
-            Контакты <span>04</span>
-          </a>
-        </nav>
-      </div>
-
+    <>
       <section className="hero-section" id="top">
         <div className="hero-section__shade" />
         <div className="hero-section__grain" />
         <div className="hero-section__content" data-reveal>
-          <p className="hero-kicker">
-            Specialty coffee · HoReCa · Service
-          </p>
+          <p className="hero-kicker">Specialty coffee · HoReCa · Service</p>
           <h1>
             Кофе.
             <br />
@@ -341,10 +385,14 @@ function App() {
             деталь.
           </p>
           <div className="hero-actions">
-            <a className="button button--light" href="#coffee">
+            <button
+              className="button button--light"
+              type="button"
+              onClick={() => scrollToId('home-catalog')}
+            >
               Смотреть каталог
               <ArrowRight size={18} />
-            </a>
+            </button>
             <a className="text-link" href="#service">
               Сервис оборудования
             </a>
@@ -354,64 +402,50 @@ function App() {
           <span>01</span>
           <p>От зерна до безупречной чашки</p>
         </div>
-        <a className="scroll-cue" href="#production" aria-label="Листать ниже">
+        <button
+          className="scroll-cue"
+          type="button"
+          onClick={() => scrollToId('home-catalog')}
+          aria-label="Листать ниже"
+        >
           <span>Scroll to explore</span>
           <ArrowDown size={17} />
-        </a>
+        </button>
       </section>
 
-      <section className="catalog-index section-dark" id="production">
+      <section className="catalog-index section-dark" id="home-catalog">
         <div className="section-heading" data-reveal>
           <div>
-            <p className="eyebrow">01 / Продукция</p>
+            <p className="eyebrow">01 / Каталог</p>
             <h2>
-              Всё для <em>идеальной</em> чашки
+              Выберите <em>категорию</em>
             </h2>
           </div>
           <p>
-            Кофе собственной подборки, профессиональная химия и пространство
-            для будущих коллекций.
+            Каждое направление — на отдельной странице. Кофе, профессиональная
+            химия, оборудование и разделы, которые скоро пополнятся.
           </p>
         </div>
-        <div className="category-switcher" data-reveal>
-          <div className="category-tabs" role="tablist" aria-label="Категории продукции">
-            {categories.map((category) => (
-              <button
-                type="button"
-                role="tab"
-                aria-selected={activeCategory === category.id}
-                className={activeCategory === category.id ? 'is-active' : ''}
-                onClick={() => setActiveCategory(category.id)}
-                key={category.id}
-              >
-                <span>{category.number}</span>
-                {category.name}
-              </button>
-            ))}
-          </div>
-          <div
-            className="category-stage"
-            data-category={selectedCategory.id}
-            role="tabpanel"
-          >
-            <div className="category-stage__copy">
-              <p className="eyebrow">{selectedCategory.note}</p>
-              <h3>{selectedCategory.name}</h3>
-              <p>{selectedCategory.description}</p>
-              <a href={selectedCategory.href}>
-                Открыть раздел
-                <ArrowUpRight size={18} />
-              </a>
-            </div>
-            <div className="category-stage__visual" aria-hidden="true">
-              <span className="category-stage__count">
-                {selectedCategory.count}
-              </span>
-              <div className="category-orbit category-orbit--one" />
-              <div className="category-orbit category-orbit--two" />
-              <strong>{selectedCategory.number}</strong>
-            </div>
-          </div>
+        <div className="category-nav" data-reveal>
+          {catalogCategories.map((category) => (
+            <a
+              key={category.id}
+              href={`#${category.id}`}
+              className={`category-nav__item ${
+                category.available ? '' : 'category-nav__item--soon'
+              }`}
+            >
+              <span className="category-nav__num">{category.number}</span>
+              <div className="category-nav__body">
+                <h3>{category.name}</h3>
+                <p>{category.description}</p>
+              </div>
+              <div className="category-nav__meta">
+                <span className="category-nav__count">{category.count}</span>
+                <ArrowUpRight size={22} />
+              </div>
+            </a>
+          ))}
         </div>
       </section>
 
@@ -443,83 +477,73 @@ function App() {
         </div>
       </section>
 
-      <section className="coffee-section section-cream" id="coffee">
-        <div className="section-heading section-heading--dark" data-reveal>
-          <div>
-            <p className="eyebrow">03 / Коллекция кофе</p>
-            <h2>
-              Пять разных
-              <br />
-              <em>характеров</em>
-            </h2>
-          </div>
-          <p>
-            Нажмите на карточку, чтобы посмотреть подтверждённые
-            характеристики, варианты фасовки и актуальные цены.
-          </p>
+      <section className="home-cta" data-reveal>
+        <div>
+          <p className="eyebrow">Готовы обсудить проект?</p>
+          <h2>
+            Подберём кофе, технику
+            <br />
+            и <em>обслуживание</em>
+          </h2>
         </div>
+        <a className="button button--dark" href="#contacts">
+          Связаться с нами
+          <ArrowUpRight size={18} />
+        </a>
+      </section>
+    </>
+  )
+}
+
+function CoffeeView({
+  onOpen,
+}: {
+  onOpen: (product: CatalogProduct) => void
+}) {
+  return (
+    <>
+      <PageHero
+        eyebrow="Каталог · 01 / Кофе"
+        title={
+          <>
+            Пять разных
+            <br />
+            <em>характеров</em>
+          </>
+        }
+        description="Нажмите на карточку, чтобы посмотреть подтверждённые характеристики, варианты фасовки и актуальные цены."
+      />
+      <section className="coffee-section section-dark">
         <div className="product-grid">
           {coffeeProducts.map((product, index) => (
             <ProductCard
               product={product}
               index={index}
-              onOpen={setSelectedProduct}
+              onOpen={onOpen}
               key={product.id}
             />
           ))}
         </div>
       </section>
+    </>
+  )
+}
 
-      <section className="future-collections section-dark">
-        <div className="future-card future-card--tea" id="tea" data-reveal>
-          <div className="future-card__icon">
-            <Coffee />
-          </div>
-          <div>
-            <p className="eyebrow">Будущая коллекция / 01</p>
-            <h2>Чай</h2>
-            <p>
-              Пространство подготовлено. Добавим сорта, происхождение и
-              фотографии, когда будет сформирован ассортимент.
-            </p>
-          </div>
-          <span className="future-card__status">Скоро</span>
-        </div>
-        <div
-          className="future-card future-card--accessories"
-          id="accessories"
-          data-reveal
-        >
-          <div className="future-card__icon">
-            <PackageOpen />
-          </div>
-          <div>
-            <p className="eyebrow">Будущая коллекция / 02</p>
-            <h2>Аксессуары</h2>
-            <p>
-              Здесь появятся инструменты и детали для приготовления и подачи
-              кофе.
-            </p>
-          </div>
-          <span className="future-card__status">Скоро</span>
-        </div>
-      </section>
-
-      <section className="chemistry-section section-dark" id="chemistry">
-        <div className="section-heading" data-reveal>
-          <div>
-            <p className="eyebrow">04 / Профессиональная химия</p>
-            <h2>
-              Чистота — часть
-              <br />
-              <em>вкуса</em>
-            </h2>
-          </div>
-          <p>
-            Средства для регулярного ухода за кофейным оборудованием. Фасовки и
-            цены будут добавлены позже.
-          </p>
-        </div>
+function ChemistryView() {
+  return (
+    <>
+      <PageHero
+        eyebrow="Каталог · 02 / Химия"
+        title={
+          <>
+            Чистота — часть
+            <br />
+            <em>вкуса</em>
+          </>
+        }
+        description="Профессиональные средства для регулярного ухода за кофейным оборудованием. Фасовки и цены будут добавлены позже."
+      />
+      <section className="chemistry-section section-dark">
         <div className="chemistry-grid">
           {chemistryProducts.map((product, index) => (
             <article className="chemistry-card" key={product.code} data-reveal>
@@ -541,22 +565,29 @@ function App() {
           ))}
         </div>
       </section>
+    </>
+  )
+}
 
-      <section className="equipment-section section-stone" id="equipment">
-        <div className="section-heading section-heading--dark" data-reveal>
-          <div>
-            <p className="eyebrow">05 / Оборудование</p>
-            <h2>
-              Техника для
-              <br />
-              <em>стабильного результата</em>
-            </h2>
-          </div>
-          <p>
-            Проверенные решения для бара, кофейни и точки с высокой
-            проходимостью.
-          </p>
-        </div>
+function EquipmentView({
+  onOpen,
+}: {
+  onOpen: (product: CatalogProduct) => void
+}) {
+  return (
+    <>
+      <PageHero
+        eyebrow="Каталог · 03 / Оборудование"
+        title={
+          <>
+            Техника для
+            <br />
+            <em>стабильного результата</em>
+          </>
+        }
+        description="Проверенные решения для бара, кофейни и точки с высокой проходимостью."
+      />
+      <section className="equipment-section section-dark">
         <div className="equipment-list">
           {equipmentProducts.map((product, index) => (
             <article
@@ -577,7 +608,7 @@ function App() {
                   <h3>{product.name}</h3>
                   <p>{product.lead}</p>
                 </div>
-                <button type="button" onClick={() => setSelectedProduct(product)}>
+                <button type="button" onClick={() => onOpen(product)}>
                   Подробнее
                   <ArrowUpRight size={18} />
                 </button>
@@ -586,119 +617,250 @@ function App() {
           ))}
         </div>
       </section>
+    </>
+  )
+}
 
-      <section className="service-section" id="service">
-        <div className="service-image" data-reveal>
-          <img
-            src="/assets/service-coffee-machine.jpg"
-            alt="Обслуживание профессиональной кофемашины"
-            loading="lazy"
-          />
-          <span className="service-image__badge">
-            <Wrench size={20} />
-            Техническая экспертиза
-          </span>
-        </div>
-        <div className="service-content" data-reveal>
-          <p className="eyebrow">06 / Сервис оборудования</p>
-          <h2>
-            Машина должна
-            <br />
-            работать <em>точно</em>
-          </h2>
-          <p className="large-copy">
-            Комплексный уход за кофейным оборудованием — от плановой чистки до
-            диагностики и ремонта.
-          </p>
-          <div className="service-list">
-            {serviceItems.map((item, index) => (
-              <div key={item}>
-                <span>0{index + 1}</span>
-                <p>{item}</p>
-                {index === 0 ? <Settings size={20} /> : <Plus size={20} />}
-              </div>
-            ))}
-          </div>
-          <a className="button button--copper" href="#contacts">
-            Обсудить обслуживание
-            <ArrowRight size={18} />
+function ComingSoonView({
+  eyebrow,
+  title,
+  description,
+  icon,
+}: {
+  eyebrow: string
+  title: string
+  description: string
+  icon: ReactNode
+}) {
+  return (
+    <>
+      <PageHero eyebrow={eyebrow} title={title} />
+      <section className="coming-soon">
+        <div className="coming-soon__inner" data-reveal>
+          <span className="coming-soon__icon">{icon}</span>
+          <span className="coming-soon__status">Скоро</span>
+          <p>{description}</p>
+          <a className="button button--light" href="#contacts">
+            Оставить заявку
+            <ArrowUpRight size={18} />
           </a>
         </div>
       </section>
+    </>
+  )
+}
 
-      <section className="contact-section" id="contacts">
-        <div className="contact-intro" data-reveal>
-          <p className="eyebrow">07 / Контакты</p>
-          <h2>
-            Давайте обсудим
-            <br />
-            <em>вашу задачу</em>
-          </h2>
-          <p>
-            Подберём кофе, оборудование или формат обслуживания под ваш проект.
-          </p>
-          <div className="contact-placeholders">
-            <div>
-              <span>Телефон</span>
-              <p>+7 (000) 000-00-00</p>
+function ServiceView() {
+  return (
+    <section className="service-section" id="service-page">
+      <div className="service-image" data-reveal>
+        <img
+          src="/assets/service-coffee-machine.jpg"
+          alt="Обслуживание профессиональной кофемашины"
+          loading="lazy"
+        />
+        <span className="service-image__badge">
+          <Wrench size={20} />
+          Техническая экспертиза
+        </span>
+      </div>
+      <div className="service-content" data-reveal>
+        <a className="page-back page-back--light" href="#home">
+          <ArrowLeft size={14} />
+          На главную
+        </a>
+        <p className="eyebrow">Сервис оборудования</p>
+        <h2>
+          Машина должна
+          <br />
+          работать <em>точно</em>
+        </h2>
+        <p className="large-copy">
+          Комплексный уход за кофейным оборудованием — от плановой чистки до
+          диагностики и ремонта.
+        </p>
+        <div className="service-list">
+          {serviceItems.map((item, index) => (
+            <div key={item}>
+              <span>0{index + 1}</span>
+              <p>{item}</p>
+              {index === 0 ? <Settings size={20} /> : <Plus size={20} />}
             </div>
-            <div>
-              <span>Email</span>
-              <p>Ваш email</p>
-            </div>
-            <div>
-              <span>Адрес</span>
-              <p>Ваш город, ваш адрес</p>
-            </div>
+          ))}
+        </div>
+        <a className="button button--copper" href="#contacts">
+          Обсудить обслуживание
+          <ArrowRight size={18} />
+        </a>
+      </div>
+    </section>
+  )
+}
+
+function ContactsView({
+  submitted,
+  onSubmit,
+}: {
+  submitted: boolean
+  onSubmit: (event: FormEvent<HTMLFormElement>) => void
+}) {
+  return (
+    <section className="contact-section" id="contacts-page">
+      <div className="contact-intro" data-reveal>
+        <a className="page-back page-back--dark" href="#home">
+          <ArrowLeft size={14} />
+          На главную
+        </a>
+        <p className="eyebrow">Контакты</p>
+        <h2>
+          Давайте обсудим
+          <br />
+          <em>вашу задачу</em>
+        </h2>
+        <p>
+          Подберём кофе, оборудование или формат обслуживания под ваш проект.
+        </p>
+        <div className="contact-placeholders">
+          <div>
+            <span>Телефон</span>
+            <p>+7 (000) 000-00-00</p>
+          </div>
+          <div>
+            <span>Email</span>
+            <p>Ваш email</p>
+          </div>
+          <div>
+            <span>Адрес</span>
+            <p>Ваш город, ваш адрес</p>
           </div>
         </div>
+      </div>
 
-        <form className="contact-form" onSubmit={handleSubmit} data-reveal>
-          <label>
-            <span>Имя</span>
-            <input name="name" type="text" placeholder="Как к вам обращаться?" />
-          </label>
-          <label>
-            <span>Телефон</span>
-            <input name="phone" type="tel" placeholder="+7 (___) ___-__-__" />
-          </label>
-          <label>
-            <span>Telegram / Email</span>
-            <input
-              name="contact"
-              type="text"
-              placeholder="@username или mail@example.ru"
-            />
-          </label>
-          <label>
-            <span>Комментарий</span>
-            <textarea
-              name="comment"
-              rows={3}
-              placeholder="Расскажите, что вам нужно"
-            />
-          </label>
-          <button className="button button--light button--wide" type="submit">
-            Получить консультацию
-            <ArrowUpRight size={18} />
-          </button>
-          {submitted ? (
-            <p className="form-success">
-              <Check size={17} />
-              Демо-форма работает. Отправка будет подключена позже.
-            </p>
-          ) : (
-            <p className="form-note">
-              Пока это демонстрационная форма — данные никуда не отправляются.
-            </p>
-          )}
-        </form>
-      </section>
+      <form className="contact-form" onSubmit={onSubmit} data-reveal>
+        <label>
+          <span>Имя</span>
+          <input name="name" type="text" placeholder="Как к вам обращаться?" />
+        </label>
+        <label>
+          <span>Телефон</span>
+          <input name="phone" type="tel" placeholder="+7 (___) ___-__-__" />
+        </label>
+        <label>
+          <span>Telegram / Email</span>
+          <input
+            name="contact"
+            type="text"
+            placeholder="@username или mail@example.ru"
+          />
+        </label>
+        <label>
+          <span>Комментарий</span>
+          <textarea
+            name="comment"
+            rows={3}
+            placeholder="Расскажите, что вам нужно"
+          />
+        </label>
+        <button className="button button--light button--wide" type="submit">
+          Получить консультацию
+          <ArrowUpRight size={18} />
+        </button>
+        {submitted ? (
+          <p className="form-success">
+            <Check size={17} />
+            Демо-форма работает. Отправка будет подключена позже.
+          </p>
+        ) : (
+          <p className="form-note">
+            Пока это демонстрационная форма — данные никуда не отправляются.
+          </p>
+        )}
+      </form>
+    </section>
+  )
+}
+
+function App() {
+  const [selectedProduct, setSelectedProduct] =
+    useState<CatalogProduct | null>(null)
+  const [view, setView] = useState<View>(getViewFromHash())
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+
+  useEffect(() => {
+    const handleHashChange = () => {
+      setView(getViewFromHash())
+      setMenuOpen(false)
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    }
+    window.addEventListener('hashchange', handleHashChange)
+    return () => window.removeEventListener('hashchange', handleHashChange)
+  }, [])
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) entry.target.classList.add('is-visible')
+        })
+      },
+      { threshold: 0.12 },
+    )
+    const elements = document.querySelectorAll('[data-reveal]')
+    elements.forEach((element) => observer.observe(element))
+    return () => observer.disconnect()
+  }, [view])
+
+  const closeMenu = () => setMenuOpen(false)
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setSubmitted(true)
+  }
+
+  return (
+    <main className={view !== 'home' ? 'main--inner' : ''}>
+      <SiteHeader view={view} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+
+      <div className={`mobile-menu ${menuOpen ? 'is-open' : ''}`}>
+        <nav aria-label="Мобильная навигация">
+          {navLinks.map((link, index) => (
+            <a key={link.id} href={`#${link.id}`} onClick={closeMenu}>
+              {link.label} <span>0{index + 1}</span>
+            </a>
+          ))}
+        </nav>
+      </div>
+
+      {view === 'home' && <HomeView />}
+      {view === 'coffee' && <CoffeeView onOpen={setSelectedProduct} />}
+      {view === 'chemistry' && <ChemistryView />}
+      {view === 'equipment' && <EquipmentView onOpen={setSelectedProduct} />}
+      {view === 'tea' && (
+        <ComingSoonView
+          eyebrow="Каталог · 04 / Чай"
+          title="Чай"
+          description="Пространство подготовлено. Добавим сорта, происхождение и фотографии, когда будет сформирован ассортимент листового чая и авторских купажей."
+          icon={<Coffee size={30} />}
+        />
+      )}
+      {view === 'accessories' && (
+        <ComingSoonView
+          eyebrow="Каталог · 05 / Аксессуары"
+          title="Аксессуары"
+          description="Здесь появятся инструменты бариста, посуда и детали для точного приготовления и подачи кофе."
+          icon={<PackageOpen size={30} />}
+        />
+      )}
+      {view === 'service' && <ServiceView />}
+      {view === 'contacts' && (
+        <ContactsView submitted={submitted} onSubmit={handleSubmit} />
+      )}
 
       <footer className="site-footer">
         <BrandLogo footer />
         <p>Кофе · Оборудование · Сервис</p>
-        <a href="#top">
+        <a href="#home">
           Наверх
           <ChevronRight size={15} />
         </a>
