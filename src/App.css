@@ -1057,72 +1057,97 @@ main {
   place-items: center;
   overflow: hidden;
   background:
-    radial-gradient(circle at 50% 35%, rgba(184, 115, 70, 0.2), transparent 35%),
-    #22211d;
+    radial-gradient(ellipse at 50% 22%, rgba(255, 226, 196, 0.22), transparent 37%),
+    radial-gradient(ellipse at 50% 100%, rgba(184, 115, 70, 0.18), transparent 44%),
+    linear-gradient(135deg, #121210 0%, #2b2924 52%, #141412 100%);
+}
+
+.chemistry-card__visual::before {
+  position: absolute;
+  z-index: 0;
+  top: -8%;
+  left: 9%;
+  width: 82%;
+  height: 90%;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 229, 202, 0.17),
+    rgba(255, 229, 202, 0.02) 72%,
+    transparent
+  );
+  clip-path: polygon(37% 0, 63% 0, 98% 100%, 2% 100%);
+  content: '';
+  filter: blur(14px);
+  opacity: 0.82;
+}
+
+.chemistry-card__visual::after {
+  position: absolute;
+  z-index: 1;
+  right: 13%;
+  bottom: 5%;
+  left: 13%;
+  height: 7%;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.82);
+  box-shadow:
+    0 -5px 24px rgba(208, 154, 114, 0.15),
+    0 5px 18px rgba(0, 0, 0, 0.7);
+  content: '';
+  filter: blur(7px);
+}
+
+.chemistry-card:nth-child(1) .chemistry-card__visual {
+  background:
+    radial-gradient(ellipse at 50% 28%, rgba(147, 25, 35, 0.34), transparent 38%),
+    radial-gradient(ellipse at 50% 100%, rgba(130, 28, 36, 0.3), transparent 45%),
+    linear-gradient(135deg, #11100f 0%, #2c2020 53%, #121110 100%);
+}
+
+.chemistry-card:nth-child(2) .chemistry-card__visual {
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(186, 201, 209, 0.25), transparent 37%),
+    radial-gradient(ellipse at 50% 100%, rgba(117, 136, 145, 0.19), transparent 43%),
+    linear-gradient(135deg, #111211 0%, #262a2b 53%, #111210 100%);
+}
+
+.chemistry-card:nth-child(3) .chemistry-card__visual {
+  background:
+    radial-gradient(ellipse at 50% 24%, rgba(226, 210, 188, 0.24), transparent 37%),
+    radial-gradient(ellipse at 50% 100%, rgba(166, 125, 83, 0.2), transparent 43%),
+    linear-gradient(135deg, #121210 0%, #2b2824 53%, #121110 100%);
 }
 
 .chemistry-card__number {
   position: absolute;
+  z-index: 3;
   top: 16px;
   left: 16px;
+  color: rgba(255, 255, 255, 0.68);
   font-size: 9px;
-  opacity: 0.4;
 }
 
-.chemistry-bottle {
+.chemistry-card__visual img {
   position: relative;
-  display: grid;
-  width: 41%;
-  height: 54%;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-radius: 8px 8px 18px 18px;
-  place-items: center;
-  box-shadow: inset 0 0 50px rgba(255, 255, 255, 0.04);
-  color: var(--cream);
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter:
+    drop-shadow(0 24px 20px rgba(0, 0, 0, 0.48))
+    saturate(0.88)
+    contrast(1.03);
+  transition:
+    filter 420ms ease,
+    transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.chemistry-bottle::before {
-  position: absolute;
-  top: -13%;
-  width: 46%;
-  height: 14%;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  border-bottom: none;
-  border-radius: 4px 4px 0 0;
-  content: '';
-}
-
-.chemistry-bottle::after {
-  position: absolute;
-  right: 14%;
-  bottom: 12%;
-  left: 14%;
-  height: 1px;
-  background: rgba(255, 255, 255, 0.17);
-  content: '';
-}
-
-.chemistry-bottle--2 {
-  height: 49%;
-  border-radius: 7px 7px 4px 4px;
-}
-
-.chemistry-bottle--3 {
-  width: 36%;
-  height: 59%;
-  border-radius: 22px 22px 8px 8px;
-}
-
-.chemistry-bottle--4 {
-  width: 55%;
-  height: 38%;
-  border-radius: 6px;
-}
-
-.chemistry-bottle span {
-  font-family: var(--font-serif);
-  font-size: clamp(28px, 3.3vw, 52px);
-  font-style: italic;
+.chemistry-card:hover .chemistry-card__visual img {
+  filter:
+    drop-shadow(0 29px 22px rgba(0, 0, 0, 0.58))
+    saturate(1)
+    contrast(1.04);
+  transform: translateY(-4px) scale(1.035);
 }
 
 .chemistry-card .eyebrow {

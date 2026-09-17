@@ -243,10 +243,26 @@ export const equipmentProducts: CatalogProduct[] = [
 ]
 
 export const chemistryProducts = [
-  { code: 'P63', name: 'Порошок для удаления кофейных масел' },
-  { code: 'Д3', name: 'Универсальное средство для удаления накипи' },
-  { code: 'M7', name: 'Средство для очистки молочных систем' },
-  { code: 'T5', name: 'Таблетки для удаления кофейных масел' },
+  {
+    code: 'P63',
+    name: 'Порошок для удаления кофейных масел',
+    image: '/assets/chemistry-p63-cutout.png',
+  },
+  {
+    code: 'Д3',
+    name: 'Универсальное средство для удаления накипи',
+    image: '/assets/chemistry-d3-cutout.png',
+  },
+  {
+    code: 'M7',
+    name: 'Средство для очистки молочных систем',
+    image: '/assets/chemistry-m7-cutout.png',
+  },
+  {
+    code: 'T5',
+    name: 'Таблетки для удаления кофейных масел',
+    image: '/assets/chemistry-t5-cutout.png',
+  },
 ]
 
 export const serviceItems = [

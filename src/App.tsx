@@ -525,9 +525,11 @@ function App() {
             <article className="chemistry-card" key={product.code} data-reveal>
               <div className="chemistry-card__visual">
                 <span className="chemistry-card__number">0{index + 1}</span>
-                <div className={`chemistry-bottle chemistry-bottle--${index + 1}`}>
-                  <span>{product.code}</span>
-                </div>
+                <img
+                  src={product.image}
+                  alt={`${product.name} ${product.code}`}
+                  loading="lazy"
+                />
               </div>
               <p className="eyebrow">Профессиональный уход</p>
               <h3>{product.name}</h3>
