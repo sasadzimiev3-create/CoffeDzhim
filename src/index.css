@@ -1,0 +1,77 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+:root {
+  font-family:
+    'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial,
+    sans-serif;
+  color: #eee8dc;
+  background: #121210;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --font-sans:
+    'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial,
+    sans-serif;
+  --font-serif:
+    'Iowan Old Style', 'Baskerville', 'Times New Roman', Times, serif;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 32px;
+}
+
+body {
+  min-width: 320px;
+  min-height: 100vh;
+  margin: 0;
+  background: #121210;
+}
+
+body,
+button,
+input,
+textarea {
+  font-family: var(--font-sans);
+}
+
+button,
+input,
+textarea {
+  border: 0;
+}
+
+button {
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: #b87346;
+  color: #fff;
+}
+
+:focus-visible {
+  outline: 2px solid #d09a72;
+  outline-offset: 4px;
+}
+
+#root {
+  min-height: 100vh;
+}
