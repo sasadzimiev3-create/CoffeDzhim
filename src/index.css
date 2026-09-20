@@ -8,8 +8,8 @@
   font-family:
     'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial,
     sans-serif;
-  color: #eee8dc;
-  background: #121210;
+  color: #1c1916;
+  background: #f3e6d3;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -30,7 +30,7 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: #121210;
+  background: #f3e6d3;
 }
 
 body,
@@ -63,12 +63,12 @@ img {
 }
 
 ::selection {
-  background: #b87346;
+  background: #a89078;
   color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid #d09a72;
+  outline: 2px solid #a89078;
   outline-offset: 4px;
 }
 

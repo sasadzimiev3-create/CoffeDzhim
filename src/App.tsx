@@ -127,13 +127,11 @@ function BrandLogo({ footer = false }: { footer?: boolean }) {
       href="#home"
       aria-label="CoffeDzhim.ru — на главную"
     >
-      <span className="brand__mark">
-        <span>C</span>
-        <span>D</span>
-      </span>
-      <span className="brand__word">
-        CoffeDzhim<small>.ru</small>
-      </span>
+      <img
+        className="brand__logo"
+        src="/assets/logo.png"
+        alt="CoffeDzhim.ru"
+      />
     </a>
   )
 }
@@ -640,7 +638,7 @@ function ComingSoonView({
           <span className="coming-soon__icon">{icon}</span>
           <span className="coming-soon__status">Скоро</span>
           <p>{description}</p>
-          <a className="button button--light" href="#contacts">
+          <a className="button button--dark" href="#contacts">
             Оставить заявку
             <ArrowUpRight size={18} />
           </a>
@@ -665,7 +663,7 @@ function ServiceView() {
         </span>
       </div>
       <div className="service-content" data-reveal>
-        <a className="page-back page-back--light" href="#home">
+        <a className="page-back page-back--dark" href="#home">
           <ArrowLeft size={14} />
           На главную
         </a>
@@ -761,7 +759,7 @@ function ContactsView({
             placeholder="Расскажите, что вам нужно"
           />
         </label>
-        <button className="button button--light button--wide" type="submit">
+        <button className="button button--dark button--wide" type="submit">
           Получить консультацию
           <ArrowUpRight size={18} />
         </button>
