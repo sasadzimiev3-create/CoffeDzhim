@@ -5,32 +5,45 @@
 }
 
 :root {
-  font-family:
-    'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial,
-    sans-serif;
-  color: #1c1916;
-  background: #f3e6d3;
+  --paper: #f4eee6;
+  --paper-2: #ebe3d6;
+  --paper-3: #e2d6c6;
+  --ink: #1a1410;
+  --ink-soft: #2c221c;
+  --espresso: #171210;
+  --cocoa: #3b2a22;
+  --copper: #b56a3c;
+  --copper-soft: #c9895e;
+  --cream: #faf6f0;
+  --muted: rgba(26, 20, 16, 0.58);
+  --line: rgba(26, 20, 16, 0.1);
+  --line-strong: rgba(26, 20, 16, 0.16);
+  --header-h: 76px;
+  --page-pad: clamp(20px, 4.6vw, 72px);
+  --section-pad: clamp(72px, 8vw, 128px);
+  --radius: 18px;
+  --radius-sm: 12px;
+  --font-sans: 'Manrope', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  --font-serif: 'Fraunces', 'Iowan Old Style', 'Times New Roman', serif;
+  font-family: var(--font-sans);
+  color: var(--ink);
+  background: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --font-sans:
-    'Helvetica Neue', Helvetica, -apple-system, BlinkMacSystemFont, Arial,
-    sans-serif;
-  --font-serif:
-    'Iowan Old Style', 'Baskerville', 'Times New Roman', Times, serif;
 }
 
 html {
   scroll-behavior: smooth;
-  scroll-padding-top: 32px;
+  scroll-padding-top: calc(var(--header-h) + 8px);
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: #f3e6d3;
+  background: var(--paper);
 }
 
 body,
@@ -63,13 +76,13 @@ img {
 }
 
 ::selection {
-  background: #a89078;
+  background: var(--copper);
   color: #fff;
 }
 
 :focus-visible {
-  outline: 2px solid #a89078;
-  outline-offset: 4px;
+  outline: 2px solid var(--copper);
+  outline-offset: 3px;
 }
 
 #root {

@@ -14,6 +14,7 @@ export type CatalogProduct = {
   shortName: string
   kind: string
   image: string
+  imageMode?: 'cutout' | 'photo'
   source: string
   sourceLabel: string
   lead: string
@@ -32,7 +33,8 @@ export const coffeeProducts: CatalogProduct[] = [
     name: 'Бразилия Серрадо',
     shortName: 'Серрадо',
     kind: 'Кофе для эспрессо',
-    image: '/assets/coffee-brazil.jpg',
+    image: '/assets/coffee-brazil-cutout.png',
+    imageMode: 'cutout',
     source: 'https://ingresso.coffee/product/brazil-cerrado/',
     sourceLabel: 'Ingresso Coffee',
     lead:
@@ -59,7 +61,8 @@ export const coffeeProducts: CatalogProduct[] = [
     name: 'Espresso Blend Brazil / Vietnam',
     shortName: 'Brazil / Vietnam',
     kind: 'Эспрессо-бленд',
-    image: '/assets/coffee-brazil-vietnam.jpg',
+    image: '/assets/coffee-brazil-vietnam-cutout.png',
+    imageMode: 'cutout',
     source: 'https://ingresso.coffee/product/espresso-blend-brazil-vietnam/',
     sourceLabel: 'Ingresso Coffee',
     lead:
@@ -85,7 +88,8 @@ export const coffeeProducts: CatalogProduct[] = [
     name: 'Espresso Blend Karuzo',
     shortName: 'Karuzo',
     kind: 'Тёмная обжарка',
-    image: '/assets/coffee-karuzo.jpg',
+    image: '/assets/coffee-karuzo-cutout.png',
+    imageMode: 'cutout',
     source: 'https://ingresso.coffee/product/espresso-blend-karuzo/',
     sourceLabel: 'Ingresso Coffee',
     lead:
@@ -111,7 +115,8 @@ export const coffeeProducts: CatalogProduct[] = [
     name: 'Колумбия Supremo Filter',
     shortName: 'Colombia Supremo',
     kind: 'Обжарка под фильтр',
-    image: '/assets/coffee-colombia.jpg',
+    image: '/assets/coffee-colombia-cutout.png',
+    imageMode: 'cutout',
     source: 'https://ingresso.coffee/product/kolumbiya-supremo-filtr/',
     sourceLabel: 'Ingresso Coffee',
     lead:
@@ -139,7 +144,8 @@ export const coffeeProducts: CatalogProduct[] = [
     name: 'Ассорти дрип-кофе — 30 штук',
     shortName: '30 дрипов',
     kind: 'Набор на месяц',
-    image: '/assets/coffee-drips.jpg',
+    image: '/assets/coffee-drips-crop.jpg',
+    imageMode: 'photo',
     source: 'https://ingresso.coffee/product/assorti-drip-paketov-30-shtuk/',
     sourceLabel: 'Ingresso Coffee',
     lead:
@@ -169,7 +175,8 @@ export const equipmentProducts: CatalogProduct[] = [
     name: 'Futurmat Ottima Evo',
     shortName: 'Ottima Evo',
     kind: 'Профессиональная эспрессо-машина',
-    image: '/assets/equipment-futurmat.png',
+    image: '/assets/equipment-futurmat-cutout.png',
+    imageMode: 'cutout',
     source: 'https://futurmat.evocagroup.com/en/node/2174',
     sourceLabel: 'Futurmat / Evoca Group',
     lead:
@@ -194,7 +201,8 @@ export const equipmentProducts: CatalogProduct[] = [
     name: 'Eureka Disco',
     shortName: 'Disco',
     kind: 'Автоматический темпер',
-    image: '/assets/equipment-eureka.jpg',
+    image: '/assets/equipment-eureka-cutout.png',
+    imageMode: 'cutout',
     source: 'https://entero.ru/item/321196',
     sourceLabel: 'ENTERO',
     lead:
@@ -219,6 +227,7 @@ export const equipmentProducts: CatalogProduct[] = [
     shortName: 'JL36A',
     kind: 'Суперавтоматическая кофемашина',
     image: '/assets/equipment-jetinno.webp',
+    imageMode: 'cutout',
     source:
       'https://www.jetinnomachine.com/horeca/jl36-fully-automatic-coffee-machine.html',
     sourceLabel: 'Jetinno',

@@ -7,7 +7,6 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
-  Droplets,
   Leaf,
   Mail,
   Menu,
@@ -71,6 +70,8 @@ const catalogCategories: {
   count: string
   available: boolean
   description: string
+  image?: string
+  imageMode?: 'cutout' | 'photo'
 }[] = [
   {
     id: 'coffee',
@@ -78,6 +79,8 @@ const catalogCategories: {
     name: 'Кофе Ingresso',
     count: '5 позиций',
     available: true,
+    image: '/assets/coffee-brazil-cutout.png',
+    imageMode: 'cutout',
     description:
       'Эспрессо, фильтр и дрип-кофе обжарки Ingresso — с профилями вкуса, фасовками и актуальными ценами.',
   },
@@ -87,6 +90,8 @@ const catalogCategories: {
     name: 'Оборудование',
     count: '3 позиции',
     available: true,
+    image: '/assets/equipment-futurmat-cutout.png',
+    imageMode: 'cutout',
     description:
       'Профессиональные кофемашины, суперавтоматы и барное оборудование для кофейни, ресторана и точки с высокой проходимостью.',
   },
@@ -105,6 +110,8 @@ const catalogCategories: {
     name: 'Химия и аксессуары',
     count: '4 позиции · аксессуары скоро',
     available: true,
+    image: '/assets/chemistry-p63-cutout.png',
+    imageMode: 'cutout',
     description:
       'Средства для очистки групп, молочных систем и удаления накипи. Аксессуары для бара добавим в этот же раздел.',
   },
@@ -114,12 +121,12 @@ const promoSlides = [
   {
     id: 'futurmat',
     theme: 'machine',
-    kicker: 'Оборудование',
-    title: 'Продажа кофемашины Futurmat',
-    text: 'Ottima Evo — профессиональная эспрессо-машина для бара и кофейни. Подберём конфигурацию под ваш поток.',
+    kicker: 'Оборудование для бара',
+    title: 'Futurmat Ottima Evo',
+    text: 'Профессиональная эспрессо-машина для кофейни и ресторана. Подберём конфигурацию под ваш поток и поможем запустить бар.',
     cta: 'Смотреть модель',
     href: '#equipment',
-    image: '/assets/equipment-futurmat.png',
+    image: '/assets/equipment-futurmat-cutout.png',
     imageAlt: 'Кофемашина Futurmat Ottima Evo',
   },
   {
@@ -131,15 +138,15 @@ const promoSlides = [
     text: 'Оптовая цена для HoReCa. Подскажем профиль под эспрессо, молоко и вашу карту напитков.',
     cta: 'Выбрать кофе',
     href: '#coffee',
-    image: '/assets/coffee-brazil.jpg',
+    image: '/assets/coffee-brazil-cutout.png',
     imageAlt: 'Кофе Ingresso Бразилия Серрадо',
   },
   {
     id: 'audit',
     theme: 'audit',
-    kicker: 'Сервис',
-    title: 'Бесплатная экспертиза и аудит вашего заведения',
-    text: 'Разберём зерно, оборудование и сервис — и покажем, где теряются вкус и маржа.',
+    kicker: 'Сервис и аудит',
+    title: 'Разберём ваш бар бесплатно',
+    text: 'Зерно, оборудование и сервис — покажем, где теряются вкус и маржа, и что стоит поменять в первую очередь.',
     cta: 'Оставить заявку',
     href: '#contacts',
   },
@@ -274,8 +281,11 @@ function PromoSlider() {
             {'image' in slide && slide.image ? (
               <div className="promo-slide__visual">
                 <img src={slide.image} alt={slide.imageAlt} />
+                <span className="promo-slide__shadow" aria-hidden="true" />
               </div>
-            ) : null}
+            ) : (
+              <div className="promo-slide__visual promo-slide__visual--empty" />
+            )}
           </article>
         ))}
       </div>
@@ -340,7 +350,7 @@ function SiteHeader({
   setMenuOpen: (value: boolean) => void
 }) {
   return (
-    <header className={`site-header ${view !== 'home' ? 'site-header--solid' : ''}`}>
+    <header className="site-header">
       <BrandLogo />
       <nav className="desktop-nav" aria-label="Главная навигация">
         {navLinks.map((link) => (
@@ -404,9 +414,10 @@ function ProductCard({
   onOpen: (product: CatalogProduct) => void
 }) {
   const startingPrice = product.variants?.[0]?.price
+  const imageMode = product.imageMode ?? 'cutout'
   return (
     <article
-      className={`product-card product-card--${index + 1}`}
+      className={`product-card product-card--${imageMode}`}
       data-reveal
       style={{ '--card-accent': product.accent } as CSSProperties}
     >
@@ -417,17 +428,25 @@ function ProductCard({
         aria-label={`Подробнее о ${product.name}`}
       >
         <div className="product-card__visual">
-          <div className="product-card__index">0{index + 1}</div>
+          <span className="product-card__index">0{index + 1}</span>
           <img src={product.image} alt={product.name} loading="lazy" />
+          {imageMode === 'cutout' ? (
+            <span className="product-card__shadow" aria-hidden="true" />
+          ) : null}
           <span className="product-card__arrow">
-            <ArrowUpRight size={20} />
+            <ArrowUpRight size={18} />
           </span>
         </div>
         <div className="product-card__meta">
           <p className="eyebrow">{product.kind}</p>
           <h3>{product.name}</h3>
+          <ul className="product-card__notes">
+            {product.notes.slice(0, 3).map((note) => (
+              <li key={note}>{note}</li>
+            ))}
+          </ul>
           <div className="product-card__footer">
-            <span>{product.notes.join(' · ')}</span>
+            <span>Подробнее</span>
             <strong>
               {startingPrice
                 ? `от ${formatPrice(startingPrice)}`
@@ -484,12 +503,11 @@ function ProductModal({
         </button>
 
         <div
-          className="product-modal__visual"
+          className={`product-modal__visual product-modal__visual--${product.imageMode ?? 'cutout'}`}
           style={{ '--card-accent': product.accent } as CSSProperties}
         >
           <p className="eyebrow">{product.kind}</p>
           <img src={product.image} alt={product.name} />
-          <p className="product-modal__edition">Curated selection / 2026</p>
         </div>
 
         <div className="product-modal__content">
@@ -557,18 +575,33 @@ function ProductModal({
   )
 }
 
-function HomeView() {
+function HomeView({
+  onOpen,
+}: {
+  onOpen: (product: CatalogProduct) => void
+}) {
   return (
     <>
       <section className="promo-hero" id="top">
-        <div className="promo-hero__brand">
-          <p className="hero-kicker">Specialty coffee — Equipment — people</p>
-          <h1>Кофе по честным ценам и оборудование для HoReCa</h1>
-        </div>
         <PromoSlider />
       </section>
 
-      <section className="catalog-index section-dark" id="home-catalog">
+      <section className="home-stats" aria-label="Направления">
+        <div>
+          <strong>Кофе Ingresso</strong>
+          <span>Эспрессо, фильтр и дрип с понятными профилями вкуса</span>
+        </div>
+        <div>
+          <strong>Оборудование</strong>
+          <span>Машины и барная техника под поток заведения</span>
+        </div>
+        <div>
+          <strong>Сервис</strong>
+          <span>Аудит, чистка, настройка и ремонт без простоя бара</span>
+        </div>
+      </section>
+
+      <section className="catalog-index" id="home-catalog">
         <div className="section-heading" data-reveal>
           <div>
             <p className="eyebrow">01 / Каталог</p>
@@ -577,8 +610,8 @@ function HomeView() {
             </h2>
           </div>
           <p>
-            Четыре направления: кофе Ingresso, профессиональное оборудование,
-            чай и раздел химии с аксессуарами.
+            Кофе, техника, чай и химия для бара — в одном месте, с живыми
+            ценами и понятной поставкой.
           </p>
         </div>
         <div className="category-nav" data-reveal>
@@ -590,16 +623,47 @@ function HomeView() {
                 category.available ? '' : 'category-nav__item--soon'
               }`}
             >
-              <span className="category-nav__num">{category.number}</span>
-              <div className="category-nav__body">
+              <div className="category-nav__copy">
+                <span className="category-nav__num">{category.number}</span>
                 <h3>{category.name}</h3>
                 <p>{category.description}</p>
-              </div>
-              <div className="category-nav__meta">
                 <span className="category-nav__count">{category.count}</span>
-                <ArrowUpRight size={22} />
+              </div>
+              <div className="category-nav__visual">
+                {category.image ? (
+                  <img src={category.image} alt="" />
+                ) : (
+                  <Leaf size={42} />
+                )}
               </div>
             </a>
+          ))}
+        </div>
+      </section>
+
+      <section className="featured-coffee">
+        <div className="section-heading" data-reveal>
+          <div>
+            <p className="eyebrow">02 / Обжарка</p>
+            <h2>
+              Кофе, который стоит
+              <br />
+              поставить <em>в карту</em>
+            </h2>
+          </div>
+          <a className="text-link" href="#coffee">
+            Весь каталог
+            <ArrowUpRight size={16} />
+          </a>
+        </div>
+        <div className="product-grid product-grid--featured">
+          {coffeeProducts.slice(0, 4).map((product, index) => (
+            <ProductCard
+              product={product}
+              index={index}
+              onOpen={onOpen}
+              key={product.id}
+            />
           ))}
         </div>
       </section>
@@ -613,7 +677,7 @@ function HomeView() {
           <p className="image-caption">Roaster portrait / coming soon</p>
         </div>
         <div className="roaster-copy" data-reveal>
-          <p className="eyebrow">02 / История</p>
+          <p className="eyebrow">03 / История</p>
           <h2>
             Обжарщик —<br />
             <em>автор вкуса</em>
@@ -995,7 +1059,7 @@ function App() {
   }
 
   return (
-    <main className={view !== 'home' ? 'main--inner' : ''}>
+    <main>
       <SiteHeader view={view} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
 
       <div className={`mobile-menu ${menuOpen ? 'is-open' : ''}`}>
@@ -1008,7 +1072,7 @@ function App() {
         </nav>
       </div>
 
-      {view === 'home' && <HomeView />}
+      {view === 'home' && <HomeView onOpen={setSelectedProduct} />}
       {view === 'coffee' && <CoffeeView onOpen={setSelectedProduct} />}
       {(view === 'chemistry' || view === 'accessories') && <ChemistryView />}
       {view === 'equipment' && <EquipmentView onOpen={setSelectedProduct} />}
@@ -1026,7 +1090,10 @@ function App() {
       )}
 
       <footer className="site-footer">
-        <BrandLogo footer />
+        <div className="footer-brand">
+          <BrandLogo footer />
+          <p>Кофе, оборудование и сервис для заведений, которым важен стабильный вкус.</p>
+        </div>
         <div className="footer-meta">
           <div className="footer-contacts">
             <a href={siteContacts.phoneHref}>
@@ -1040,7 +1107,7 @@ function App() {
           </div>
           <SocialLinks compact />
         </div>
-        <a href="#home">
+        <a className="footer-top" href="#home">
           Наверх
           <ChevronRight size={15} />
         </a>
@@ -1052,11 +1119,6 @@ function App() {
           onClose={() => setSelectedProduct(null)}
         />
       )}
-
-      <div className="floating-mark" aria-hidden="true">
-        <Droplets size={14} />
-        local preview
-      </div>
     </main>
   )
 }
