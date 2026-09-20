@@ -1,16 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
-  ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
   Check,
+  ChevronLeft,
   ChevronRight,
-  Coffee,
   Droplets,
+  Leaf,
+  Mail,
   Menu,
   PackageOpen,
+  Phone,
   Plus,
   Settings,
   Sparkles,
@@ -26,6 +28,11 @@ import {
   serviceItems,
   type CatalogProduct,
 } from './data/catalog'
+import {
+  siteContacts,
+  siteSocials,
+  type SocialNetwork,
+} from './data/site'
 
 type View =
   | 'home'
@@ -50,8 +57,9 @@ const views: View[] = [
 
 const navLinks: { id: View; label: string }[] = [
   { id: 'coffee', label: 'Кофе' },
-  { id: 'chemistry', label: 'Химия' },
   { id: 'equipment', label: 'Оборудование' },
+  { id: 'tea', label: 'Чай' },
+  { id: 'chemistry', label: 'Химия' },
   { id: 'service', label: 'Сервис' },
   { id: 'contacts', label: 'Контакты' },
 ]
@@ -67,57 +75,243 @@ const catalogCategories: {
   {
     id: 'coffee',
     number: '01',
-    name: 'Кофе',
+    name: 'Кофе Ingresso',
     count: '5 позиций',
     available: true,
     description:
-      'Эспрессо, фильтр и дрип-кофе с подтверждёнными профилями и актуальными вариантами фасовки.',
-  },
-  {
-    id: 'chemistry',
-    number: '02',
-    name: 'Химия',
-    count: '4 позиции',
-    available: true,
-    description:
-      'Профессиональные средства для чистоты кофейных трактов, молочных систем и удаления накипи.',
+      'Эспрессо, фильтр и дрип-кофе обжарки Ingresso — с профилями вкуса, фасовками и актуальными ценами.',
   },
   {
     id: 'equipment',
-    number: '03',
+    number: '02',
     name: 'Оборудование',
     count: '3 позиции',
     available: true,
     description:
-      'Эспрессо-машины, автоматические темперы и суперавтоматы для бара и кофейни.',
+      'Профессиональные кофемашины, суперавтоматы и барное оборудование для кофейни, ресторана и точки с высокой проходимостью.',
   },
   {
     id: 'tea',
-    number: '04',
+    number: '03',
     name: 'Чай',
     count: 'Скоро',
     available: false,
     description:
-      'Раздел готовится под будущую коллекцию листового чая и авторских купажей.',
+      'Листовой чай и купажи для чайной карты HoReCa — сорта, происхождение и форматы поставки появятся в этом разделе.',
   },
   {
-    id: 'accessories',
-    number: '05',
-    name: 'Аксессуары',
-    count: 'Скоро',
-    available: false,
+    id: 'chemistry',
+    number: '04',
+    name: 'Химия и аксессуары',
+    count: '4 позиции · аксессуары скоро',
+    available: true,
     description:
-      'Инструменты бариста, посуда и аксессуары для точного приготовления и подачи.',
+      'Средства для очистки групп, молочных систем и удаления накипи. Аксессуары для бара добавим в этот же раздел.',
   },
 ]
+
+const promoSlides = [
+  {
+    id: 'futurmat',
+    theme: 'machine',
+    kicker: 'Оборудование',
+    title: 'Продажа кофемашины Futurmat',
+    text: 'Ottima Evo — профессиональная эспрессо-машина для бара и кофейни. Подберём конфигурацию под ваш поток.',
+    cta: 'Смотреть модель',
+    href: '#equipment',
+    image: '/assets/equipment-futurmat.png',
+    imageAlt: 'Кофемашина Futurmat Ottima Evo',
+  },
+  {
+    id: 'coffee-offer',
+    theme: 'coffee',
+    kicker: 'Кофе Ingresso',
+    title: '10 кг кофе',
+    price: '18 500 ₽',
+    text: 'Оптовая цена для HoReCa. Подскажем профиль под эспрессо, молоко и вашу карту напитков.',
+    cta: 'Выбрать кофе',
+    href: '#coffee',
+    image: '/assets/coffee-brazil.jpg',
+    imageAlt: 'Кофе Ingresso Бразилия Серрадо',
+  },
+  {
+    id: 'audit',
+    theme: 'audit',
+    kicker: 'Сервис',
+    title: 'Бесплатная экспертиза и аудит вашего заведения',
+    text: 'Разберём зерно, оборудование и сервис — и покажем, где теряются вкус и маржа.',
+    cta: 'Оставить заявку',
+    href: '#contacts',
+  },
+] as const
 
 function getViewFromHash(): View {
   const hash = window.location.hash.replace('#', '') as View
   return views.includes(hash) ? hash : 'home'
 }
 
-function scrollToId(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+function SocialIcon({ network }: { network: SocialNetwork }) {
+  if (network === 'instagram') {
+    return (
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H8Zm8.2 1.6a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 8.2A3.8 3.8 0 1 1 8.2 12 3.8 3.8 0 0 1 12 8.2Zm0 2a1.8 1.8 0 1 0 1.8 1.8A1.8 1.8 0 0 0 12 10.2Z"
+        />
+      </svg>
+    )
+  }
+  if (network === 'telegram') {
+    return (
+      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M21.8 4.3 3.4 11.4c-1.3.5-1.2 1.2-.2 1.5l4.7 1.4 10.8-6.8c.5-.3 1-.1.6.2l-8.7 7.9-.3 4.5c.5 0 .7-.2 1-.5l2.3-2.2 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.2-.4-1.8-1.4-1.4Z"
+        />
+      </svg>
+    )
+  }
+  return (
+    <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M19.1 4.9A10 10 0 0 0 3.2 16.5L2 22l5.6-1.1A10 10 0 0 0 19.1 4.9Zm-7.1 15.3c-1.5 0-3-.4-4.3-1.1l-.3-.2-3.3.9.9-3.2-.2-.3a8.3 8.3 0 1 1 7.2 3.9Zm4.5-6.2c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1l-.8 1c-.2.2-.3.2-.6.1a6.8 6.8 0 0 1-3.3-2.9c-.2-.4 0-.5.1-.7l.5-.6c.1-.2.2-.3.2-.5s0-.4-.1-.5l-.8-1.9c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3s-1 1-1 2.4 1 2.8 1.2 3 .2.3 2.1 3.2c1.7 1.5 2.3 1.7 3.1 2 .3.1.9.1 1.3.1s1.3-.3 1.5-.7.9-1.1 1-1.4-.1-.3-.3-.4Z"
+      />
+    </svg>
+  )
+}
+
+function SocialLinks({ compact = false }: { compact?: boolean }) {
+  return (
+    <div
+      className={`social-links ${compact ? 'social-links--compact' : ''}`}
+      aria-label="Социальные сети"
+    >
+      {siteSocials.map((item) =>
+        item.href ? (
+          <a
+            key={item.id}
+            className="social-links__item"
+            href={item.href}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={item.label}
+          >
+            <SocialIcon network={item.id} />
+          </a>
+        ) : (
+          <span
+            key={item.id}
+            className="social-links__item is-soon"
+            title={`${item.label} — ссылка появится позже`}
+            aria-label={`${item.label}, ссылка появится позже`}
+          >
+            <SocialIcon network={item.id} />
+          </span>
+        ),
+      )}
+    </div>
+  )
+}
+
+function PromoSlider() {
+  const [index, setIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const touchX = useRef<number | null>(null)
+  const count = promoSlides.length
+
+  const goTo = (next: number) => {
+    setPaused(true)
+    setIndex(((next % count) + count) % count)
+  }
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    if (paused || media.matches) return undefined
+    const timer = window.setInterval(() => {
+      setIndex((current) => (current + 1) % count)
+    }, 6500)
+    return () => window.clearInterval(timer)
+  }, [paused, count])
+
+  return (
+    <div
+      className="promo-slider"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onTouchStart={(event) => {
+        touchX.current = event.touches[0].clientX
+      }}
+      onTouchEnd={(event) => {
+        if (touchX.current == null) return
+        const delta = event.changedTouches[0].clientX - touchX.current
+        if (Math.abs(delta) > 40) goTo(index + (delta < 0 ? 1 : -1))
+        touchX.current = null
+      }}
+    >
+      <div
+        className="promo-slider__track"
+        style={{ transform: `translateX(-${index * 100}%)` }}
+      >
+        {promoSlides.map((slide) => (
+          <article
+            className={`promo-slide promo-slide--${slide.theme}`}
+            key={slide.id}
+            aria-hidden={slide.id !== promoSlides[index].id}
+          >
+            <div className="promo-slide__copy">
+              <p className="eyebrow">{slide.kicker}</p>
+              <h2>{slide.title}</h2>
+              {'price' in slide && slide.price ? (
+                <strong className="promo-slide__price">{slide.price}</strong>
+              ) : null}
+              <p>{slide.text}</p>
+              <a className="button button--light" href={slide.href}>
+                {slide.cta}
+                <ArrowRight size={18} />
+              </a>
+            </div>
+            {'image' in slide && slide.image ? (
+              <div className="promo-slide__visual">
+                <img src={slide.image} alt={slide.imageAlt} />
+              </div>
+            ) : null}
+          </article>
+        ))}
+      </div>
+
+      <button
+        className="promo-slider__arrow promo-slider__arrow--prev"
+        type="button"
+        onClick={() => goTo(index - 1)}
+        aria-label="Предыдущий баннер"
+      >
+        <ChevronLeft size={20} />
+      </button>
+      <button
+        className="promo-slider__arrow promo-slider__arrow--next"
+        type="button"
+        onClick={() => goTo(index + 1)}
+        aria-label="Следующий баннер"
+      >
+        <ChevronRight size={20} />
+      </button>
+
+      <div className="promo-slider__dots" role="tablist" aria-label="Баннеры">
+        {promoSlides.map((slide, slideIndex) => (
+          <button
+            key={slide.id}
+            type="button"
+            role="tab"
+            aria-label={`Баннер ${slideIndex + 1}: ${slide.title}`}
+            aria-selected={slideIndex === index}
+            className={slideIndex === index ? 'is-active' : ''}
+            onClick={() => goTo(slideIndex)}
+          />
+        ))}
+      </div>
+    </div>
+  )
 }
 
 function BrandLogo({ footer = false }: { footer?: boolean }) {
@@ -187,7 +381,7 @@ function PageHero({
 }) {
   return (
     <section className="page-hero">
-      <div className="page-hero__inner" data-reveal>
+      <div className="page-hero__inner">
         <a className="page-back" href="#home">
           <ArrowLeft size={14} />
           Каталог
@@ -366,49 +560,12 @@ function ProductModal({
 function HomeView() {
   return (
     <>
-      <section className="hero-section" id="top">
-        <div className="hero-section__shade" />
-        <div className="hero-section__grain" />
-        <div className="hero-section__content" data-reveal>
-          <p className="hero-kicker">Specialty coffee · HoReCa · Service</p>
-          <h1>
-            Кофе.
-            <br />
-            Техника.
-            <br />
-            <em>Точность.</em>
-          </h1>
-          <p className="hero-copy">
-            Премиальный кофе и оборудование для бизнеса, где важна каждая
-            деталь.
-          </p>
-          <div className="hero-actions">
-            <button
-              className="button button--light"
-              type="button"
-              onClick={() => scrollToId('home-catalog')}
-            >
-              Смотреть каталог
-              <ArrowRight size={18} />
-            </button>
-            <a className="text-link" href="#service">
-              Сервис оборудования
-            </a>
-          </div>
+      <section className="promo-hero" id="top">
+        <div className="promo-hero__brand">
+          <p className="hero-kicker">Specialty coffee — Equipment — people</p>
+          <h1>Кофе по честным ценам и оборудование для HoReCa</h1>
         </div>
-        <div className="hero-side-note">
-          <span>01</span>
-          <p>От зерна до безупречной чашки</p>
-        </div>
-        <button
-          className="scroll-cue"
-          type="button"
-          onClick={() => scrollToId('home-catalog')}
-          aria-label="Листать ниже"
-        >
-          <span>Scroll to explore</span>
-          <ArrowDown size={17} />
-        </button>
+        <PromoSlider />
       </section>
 
       <section className="catalog-index section-dark" id="home-catalog">
@@ -420,8 +577,8 @@ function HomeView() {
             </h2>
           </div>
           <p>
-            Каждое направление — на отдельной странице. Кофе, профессиональная
-            химия, оборудование и разделы, которые скоро пополнятся.
+            Четыре направления: кофе Ingresso, профессиональное оборудование,
+            чай и раздел химии с аксессуарами.
           </p>
         </div>
         <div className="category-nav" data-reveal>
@@ -501,15 +658,15 @@ function CoffeeView({
   return (
     <>
       <PageHero
-        eyebrow="Каталог · 01 / Кофе"
+        eyebrow="Каталог · 01 / Кофе Ingresso"
         title={
           <>
-            Пять разных
+            Кофе
             <br />
-            <em>характеров</em>
+            <em>Ingresso</em>
           </>
         }
-        description="Нажмите на карточку, чтобы посмотреть подтверждённые характеристики, варианты фасовки и актуальные цены."
+        description="Эспрессо, фильтр и дрип-форматы. Нажмите на карточку, чтобы посмотреть характеристики, фасовку и цену."
       />
       <section className="coffee-section section-dark">
         <div className="product-grid">
@@ -531,7 +688,7 @@ function ChemistryView() {
   return (
     <>
       <PageHero
-        eyebrow="Каталог · 02 / Химия"
+        eyebrow="Каталог · 04 / Химия и аксессуары"
         title={
           <>
             Чистота — часть
@@ -539,7 +696,7 @@ function ChemistryView() {
             <em>вкуса</em>
           </>
         }
-        description="Профессиональные средства для регулярного ухода за кофейным оборудованием. Фасовки и цены будут добавлены позже."
+        description="Профессиональная химия для ухода за кофейным оборудованием. Аксессуары для бара появятся в этом же разделе."
       />
       <section className="chemistry-section section-dark">
         <div className="chemistry-grid">
@@ -562,6 +719,23 @@ function ChemistryView() {
             </article>
           ))}
         </div>
+        <a className="accessories-teaser" href="#contacts" data-reveal>
+          <span className="accessories-teaser__icon">
+            <PackageOpen size={22} />
+          </span>
+          <div>
+            <p className="eyebrow">Аксессуары · скоро</p>
+            <h3>Инструменты бариста и детали бара</h3>
+            <p>
+              Темперы, питчеры, посуда и расходники добавим сюда же, рядом с
+              химией для ежедневного ухода.
+            </p>
+          </div>
+          <span className="accessories-teaser__cta">
+            Оставить заявку
+            <ArrowUpRight size={18} />
+          </span>
+        </a>
       </section>
     </>
   )
@@ -575,7 +749,7 @@ function EquipmentView({
   return (
     <>
       <PageHero
-        eyebrow="Каталог · 03 / Оборудование"
+        eyebrow="Каталог · 02 / Оборудование"
         title={
           <>
             Техника для
@@ -583,7 +757,7 @@ function EquipmentView({
             <em>стабильного результата</em>
           </>
         }
-        description="Проверенные решения для бара, кофейни и точки с высокой проходимостью."
+        description="Кофемашины, суперавтоматы и барное оборудование для кофейни, ресторана и точки с высокой проходимостью. Подберём модель под поток и формат заведения."
       />
       <section className="equipment-section section-dark">
         <div className="equipment-list">
@@ -634,7 +808,7 @@ function ComingSoonView({
     <>
       <PageHero eyebrow={eyebrow} title={title} />
       <section className="coming-soon">
-        <div className="coming-soon__inner" data-reveal>
+        <div className="coming-soon__inner">
           <span className="coming-soon__icon">{icon}</span>
           <span className="coming-soon__status">Скоро</span>
           <p>{description}</p>
@@ -721,15 +895,19 @@ function ContactsView({
         <div className="contact-placeholders">
           <div>
             <span>Телефон</span>
-            <p>+7 (000) 000-00-00</p>
+            <p>
+              <a href={siteContacts.phoneHref}>{siteContacts.phoneDisplay}</a>
+            </p>
           </div>
           <div>
             <span>Email</span>
-            <p>Ваш email</p>
+            <p>
+              <a href={siteContacts.emailHref}>{siteContacts.email}</a>
+            </p>
           </div>
           <div>
-            <span>Адрес</span>
-            <p>Ваш город, ваш адрес</p>
+            <span>Соцсети</span>
+            <SocialLinks />
           </div>
         </div>
       </div>
@@ -832,22 +1010,14 @@ function App() {
 
       {view === 'home' && <HomeView />}
       {view === 'coffee' && <CoffeeView onOpen={setSelectedProduct} />}
-      {view === 'chemistry' && <ChemistryView />}
+      {(view === 'chemistry' || view === 'accessories') && <ChemistryView />}
       {view === 'equipment' && <EquipmentView onOpen={setSelectedProduct} />}
       {view === 'tea' && (
         <ComingSoonView
-          eyebrow="Каталог · 04 / Чай"
+          eyebrow="Каталог · 03 / Чай"
           title="Чай"
-          description="Пространство подготовлено. Добавим сорта, происхождение и фотографии, когда будет сформирован ассортимент листового чая и авторских купажей."
-          icon={<Coffee size={30} />}
-        />
-      )}
-      {view === 'accessories' && (
-        <ComingSoonView
-          eyebrow="Каталог · 05 / Аксессуары"
-          title="Аксессуары"
-          description="Здесь появятся инструменты бариста, посуда и детали для точного приготовления и подачи кофе."
-          icon={<PackageOpen size={30} />}
+          description="Готовим чайную карту для HoReCa: листовые сорта, купажи и форматы поставки. Оставьте заявку — сообщим, когда ассортимент появится на сайте."
+          icon={<Leaf size={30} />}
         />
       )}
       {view === 'service' && <ServiceView />}
@@ -857,7 +1027,19 @@ function App() {
 
       <footer className="site-footer">
         <BrandLogo footer />
-        <p>Кофе · Оборудование · Сервис</p>
+        <div className="footer-meta">
+          <div className="footer-contacts">
+            <a href={siteContacts.phoneHref}>
+              <Phone size={14} />
+              {siteContacts.phoneDisplay}
+            </a>
+            <a href={siteContacts.emailHref}>
+              <Mail size={14} />
+              {siteContacts.email}
+            </a>
+          </div>
+          <SocialLinks compact />
+        </div>
         <a href="#home">
           Наверх
           <ChevronRight size={15} />
