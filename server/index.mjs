@@ -18,24 +18,20 @@ const TIME_ZONE = 'Europe/Moscow'
 
 const API = `https://api.telegram.org/bot${TOKEN}`
 
-const NAV = {
-  leads: '📋 Заявки',
-  fresh: '🆕 Новые',
-  work: '📂 В работе',
-  contacts: '📞 Контакты',
-  help: 'ℹ️ Помощь',
-  exit: '🚪 Выйти',
-}
+const ALL_LEADS = 'Все заявки'
+const OLD_NAV_BUTTONS = [
+  ALL_LEADS,
+  '📋 Заявки',
+  '🆕 Новые',
+  '📂 В работе',
+  '📞 Контакты',
+  'ℹ️ Помощь',
+  '🚪 Выйти',
+]
 
 const SOURCE_LABEL = {
-  service: 'Сервис / обслуживание',
+  service: 'Сервис',
   contacts: 'Контакты',
-}
-
-const STATUS_LABEL = {
-  new: '🆕 Новая',
-  in_progress: '📂 В работе',
-  done: '✅ Готово',
 }
 
 const MIME = {
@@ -121,12 +117,7 @@ function formatShort(iso) {
 
 function navKeyboard() {
   return {
-    keyboard: [
-      [{ text: NAV.leads }],
-      [{ text: NAV.fresh }, { text: NAV.work }],
-      [{ text: NAV.contacts }, { text: NAV.help }],
-      [{ text: NAV.exit }],
-    ],
+    keyboard: [[{ text: ALL_LEADS }]],
     resize_keyboard: true,
     is_persistent: true,
   }
@@ -209,88 +200,81 @@ function contactLink(contact) {
   return escapeHtml(value)
 }
 
-function leadText(lead) {
+function leadDataLines(lead) {
+  const source = SOURCE_LABEL[lead.source] || lead.source
   const lines = [
-    `${STATUS_LABEL[lead.status]} · заявка №${lead.id}`,
-    '',
-    `<b>Раздел:</b> ${escapeHtml(SOURCE_LABEL[lead.source] || lead.source)}`,
+    lead.serviceType
+      ? `${escapeHtml(source)} · ${escapeHtml(lead.serviceType)}`
+      : escapeHtml(source),
+    escapeHtml(lead.name),
+    `<code>${escapeHtml(lead.phone)}</code>`,
   ]
-  if (lead.serviceType) lines.push(`<b>Услуга:</b> ${escapeHtml(lead.serviceType)}`)
-  lines.push(`<b>Имя:</b> ${escapeHtml(lead.name)}`)
-  lines.push(`<b>Телефон:</b> <code>${escapeHtml(lead.phone)}</code>`)
-  if (lead.contact) lines.push(`<b>Telegram / Email:</b> ${contactLink(lead.contact)}`)
-  if (lead.comment) {
-    lines.push(`<b>Комментарий:</b>`)
-    lines.push(escapeHtml(lead.comment))
-  }
-  lines.push(`<b>Когда:</b> ${escapeHtml(formatWhen(lead.createdAt))} (МСК)`)
-  return lines.join('\n')
+  if (lead.contact) lines.push(contactLink(lead.contact))
+  if (lead.comment) lines.push('', escapeHtml(lead.comment))
+  lines.push('', escapeHtml(formatWhen(lead.createdAt)))
+  return lines
 }
 
-function leadKeyboard(lead) {
-  const rows = []
-  const phone = digitsPhone(lead.phone)
-  const actions = []
-  if (phone.length >= 10) {
-    actions.push({
-      text: '💬 WhatsApp',
-      url: `https://wa.me/${phone}`,
-    })
-  }
-  const username = String(lead.contact || '').trim()
-  if (/^@?[a-zA-Z][\w]{3,31}$/.test(username.replace(/\s/g, ''))) {
-    actions.push({
-      text: '✈️ Telegram',
-      url: `https://t.me/${username.replace(/^@/, '')}`,
-    })
-  }
-  if (actions.length) rows.push(actions)
+function leadText(lead) {
+  return [`Заявка №${lead.id}`, '', ...leadDataLines(lead)].join('\n')
+}
 
-  const statusRow = []
-  if (lead.status !== 'in_progress') {
-    statusRow.push({ text: '📂 В работу', callback_data: `s:${lead.id}:work` })
+function newLeadText(lead) {
+  return ['Новая заявка', '', ...leadDataLines(lead)].join('\n')
+}
+
+function allLeadsChrono() {
+  return [...store.leads]
+}
+
+function listText(leads) {
+  if (!leads.length) return 'Заявок пока нет.'
+  const lines = leads.map(
+    (lead, index) =>
+      `${index + 1}. ${escapeHtml(lead.name)} · ${escapeHtml(lead.phone)} · ${escapeHtml(formatShort(lead.createdAt))}`,
+  )
+  const full = lines.join('\n')
+  if (full.length <= 3500) return full
+  const keepNewest = 8
+  const newest = lines.slice(-keepNewest)
+  let oldest = []
+  let size = newest.join('\n').length + 5
+  for (const line of lines.slice(0, -keepNewest)) {
+    if (size + line.length + 1 > 3500) break
+    oldest.push(line)
+    size += line.length + 1
   }
-  if (lead.status !== 'done') {
-    statusRow.push({ text: '✅ Готово', callback_data: `s:${lead.id}:done` })
+  return [...oldest, '…', ...newest].join('\n')
+}
+
+function leadButton(lead) {
+  return {
+    text: clip(`${lead.name} · ${formatShort(lead.createdAt)}`, 32),
+    callback_data: `o:${lead.id}`,
   }
-  if (lead.status !== 'new') {
-    statusRow.push({ text: '🆕 Снова новая', callback_data: `s:${lead.id}:new` })
+}
+
+function listActionKeyboard(leads, skipNewest = 0) {
+  const skip = Math.max(0, Number(skipNewest) || 0)
+  const remaining = leads.slice(0, Math.max(0, leads.length - skip))
+  const newestThree = remaining.slice(-3).reverse()
+  const rows = newestThree.map((lead) => [leadButton(lead)])
+  const restCount = remaining.length - newestThree.length
+  if (restCount > 0) {
+    rows.push([
+      {
+        text: 'Остальные',
+        callback_data: `r:${skip + newestThree.length}`,
+      },
+    ])
   }
-  if (statusRow.length) rows.push(statusRow)
-  rows.push([{ text: '📋 К заявкам', callback_data: 'nav:leads' }])
   return { inline_keyboard: rows }
 }
 
-function listLeads(status) {
-  const items = store.leads
-    .filter((lead) => !status || lead.status === status)
-    .slice(-12)
-    .reverse()
-  return items
-}
-
-function listText(title, leads) {
-  if (!leads.length) {
-    return `${title}\n\nПока пусто. Как только клиент оставит заявку на сайте, она появится здесь.`
+function backKeyboard() {
+  return {
+    inline_keyboard: [[{ text: ALL_LEADS, callback_data: 'r:0' }]],
   }
-  const lines = [title, '']
-  for (const lead of leads) {
-    lines.push(
-      `${STATUS_LABEL[lead.status]} <b>№${lead.id}</b> · ${escapeHtml(lead.name)} · ${escapeHtml(lead.phone)} · ${escapeHtml(formatShort(lead.createdAt))}`,
-    )
-  }
-  lines.push('', 'Откройте заявку кнопкой ниже.')
-  return lines.join('\n')
-}
-
-function listKeyboard(leads) {
-  const rows = leads.map((lead) => [
-    {
-      text: `${lead.status === 'done' ? '✅' : lead.status === 'in_progress' ? '📂' : '🆕'} №${lead.id} · ${lead.name}`,
-      callback_data: `o:${lead.id}`,
-    },
-  ])
-  return { inline_keyboard: rows }
 }
 
 async function send(chatId, text, extra = {}) {
@@ -304,31 +288,28 @@ async function send(chatId, text, extra = {}) {
 }
 
 async function answer(callbackQueryId, text) {
-  await telegram('answerCallbackQuery', {
-    callback_query_id: callbackQueryId,
-    text,
-  })
+  const payload = { callback_query_id: callbackQueryId }
+  if (text) payload.text = text
+  await telegram('answerCallbackQuery', payload)
 }
 
-const HELP_TEXT = [
-  '<b>CoffeDzhim — панель менеджера</b>',
-  '',
-  'Новые заявки с сайта приходят сюда сразу, с данными клиента и временем.',
-  '',
-  `${NAV.leads} — все обращения`,
-  `${NAV.fresh} — ещё не взятые в работу`,
-  `${NAV.work} — текущие`,
-  `${NAV.contacts} — телефон и почта компании`,
-  `${NAV.exit} — отключить уведомления`,
-].join('\n')
-
-const CONTACTS_TEXT = [
-  '<b>Контакты CoffeDzhim</b>',
-  '',
-  '📞 <a href="tel:+79522839932">+7 952 283-99-32</a>',
-  '✉️ <a href="mailto:dbr1994@yandex.ru">dbr1994@yandex.ru</a>',
-  '💬 <a href="https://wa.me/79522839932">WhatsApp</a>',
-].join('\n')
+async function sendLeadList(chatId, skipNewest = 0) {
+  const leads = allLeadsChrono()
+  const sent = await send(chatId, listText(leads), { reply_markup: navKeyboard() })
+  if (!leads.length) return sent
+  try {
+    await telegram('editMessageReplyMarkup', {
+      chat_id: chatId,
+      message_id: sent.message_id,
+      reply_markup: listActionKeyboard(leads, skipNewest),
+    })
+  } catch {
+    await send(chatId, listText(leads), {
+      reply_markup: listActionKeyboard(leads, skipNewest),
+    })
+  }
+  return sent
+}
 
 async function authorize(from) {
   const existing = store.subscribers.find((item) => item.chatId === from.id)
@@ -347,63 +328,24 @@ async function authorize(from) {
   return true
 }
 
-async function revoke(chatId) {
-  store.subscribers = store.subscribers.filter((item) => item.chatId !== chatId)
-  await saveStore()
-}
-
 async function handleAuthorizedMessage(msg) {
   const chatId = msg.chat.id
   const text = String(msg.text || '').trim()
 
-  if (text === NAV.leads || text === '/leads') {
-    const leads = listLeads()
-    await send(chatId, listText('<b>Все заявки</b>', leads), {
-      reply_markup: leads.length ? listKeyboard(leads) : navKeyboard(),
-    })
-    return
-  }
-  if (text === NAV.fresh) {
-    const leads = listLeads('new')
-    await send(chatId, listText('<b>Новые заявки</b>', leads), {
-      reply_markup: leads.length ? listKeyboard(leads) : navKeyboard(),
-    })
-    return
-  }
-  if (text === NAV.work) {
-    const leads = listLeads('in_progress')
-    await send(chatId, listText('<b>Заявки в работе</b>', leads), {
-      reply_markup: leads.length ? listKeyboard(leads) : navKeyboard(),
-    })
-    return
-  }
-  if (text === NAV.contacts) {
-    await send(chatId, CONTACTS_TEXT, { reply_markup: navKeyboard() })
-    return
-  }
-  if (text === NAV.help || text === '/help' || text === '/start') {
-    await send(chatId, HELP_TEXT, { reply_markup: navKeyboard() })
-    return
-  }
-  if (text === NAV.exit) {
-    await revoke(chatId)
-    await send(
-      chatId,
-      'Уведомления выключены.\nЧтобы снова открыть панель, введите пароль <code>1234</code>.',
-      { reply_markup: hideKeyboard() },
-    )
+  if (text === '/start' || text === '/help') {
+    await send(chatId, 'Нажмите «Все заявки».', { reply_markup: navKeyboard() })
     return
   }
   if (text === PASSWORD) {
-    await send(chatId, 'Вы уже в панели менеджера.', { reply_markup: navKeyboard() })
+    await send(chatId, 'Нажмите «Все заявки».', { reply_markup: navKeyboard() })
+    return
+  }
+  if (OLD_NAV_BUTTONS.includes(text) || text === '/leads') {
+    await sendLeadList(chatId)
     return
   }
 
-  await send(
-    chatId,
-    'Используйте кнопки панели ниже — так быстрее открыть заявки и контакты.',
-    { reply_markup: navKeyboard() },
-  )
+  await send(chatId, 'Нажмите «Все заявки».', { reply_markup: navKeyboard() })
 }
 
 async function handleMessage(msg) {
@@ -416,18 +358,14 @@ async function handleMessage(msg) {
       await authorize(msg.from)
       await send(
         chatId,
-        [
-          'Доступ открыт. Это панель менеджера CoffeDzhim.',
-          '',
-          'Заявки с разделов «Сервис» и «Контакты» будут приходить сюда сразу — с данными клиента и временем.',
-        ].join('\n'),
+        'Готово. Нажмите «Все заявки».',
         { reply_markup: navKeyboard() },
       )
       return
     }
     await send(
       chatId,
-      'Это бот заявок CoffeDzhim.\nВведите пароль, чтобы открыть панель менеджера.',
+      'Введите пароль.',
       { reply_markup: hideKeyboard() },
     )
     return
@@ -444,12 +382,26 @@ async function handleCallback(query) {
   }
 
   const data = String(query.data || '')
-  if (data === 'nav:leads') {
-    const leads = listLeads()
-    await answer(query.id, 'Заявки')
-    await send(chatId, listText('<b>Все заявки</b>', leads), {
-      reply_markup: leads.length ? listKeyboard(leads) : navKeyboard(),
-    })
+  if (data === 'nav:leads' || data === 'r:0') {
+    await answer(query.id, '')
+    await sendLeadList(chatId)
+    return
+  }
+
+  const restMatch = /^r:(\d+)$/.exec(data)
+  if (restMatch) {
+    const skip = Number(restMatch[1])
+    const leads = allLeadsChrono()
+    await answer(query.id, '')
+    try {
+      await telegram('editMessageReplyMarkup', {
+        chat_id: chatId,
+        message_id: query.message.message_id,
+        reply_markup: listActionKeyboard(leads, skip),
+      })
+    } catch {
+      await sendLeadList(chatId, skip)
+    }
     return
   }
 
@@ -460,34 +412,9 @@ async function handleCallback(query) {
       await answer(query.id, 'Заявка не найдена')
       return
     }
-    await answer(query.id, `Заявка №${lead.id}`)
-    await send(chatId, leadText(lead), { reply_markup: leadKeyboard(lead) })
+    await answer(query.id, '')
+    await send(chatId, leadText(lead), { reply_markup: backKeyboard() })
     return
-  }
-
-  const statusMatch = /^s:(\d+):(new|work|done)$/.exec(data)
-  if (statusMatch) {
-    const lead = findLead(statusMatch[1])
-    if (!lead) {
-      await answer(query.id, 'Заявка не найдена')
-      return
-    }
-    const next = statusMatch[2] === 'work' ? 'in_progress' : statusMatch[2]
-    lead.status = next
-    await saveStore()
-    await answer(query.id, `Статус: ${STATUS_LABEL[next]}`)
-    try {
-      await telegram('editMessageText', {
-        chat_id: chatId,
-        message_id: query.message.message_id,
-        text: leadText(lead),
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-        reply_markup: leadKeyboard(lead),
-      })
-    } catch {
-      await send(chatId, leadText(lead), { reply_markup: leadKeyboard(lead) })
-    }
   }
 }
 
@@ -498,9 +425,7 @@ async function notifyLead(lead) {
   }
   for (const subscriber of [...store.subscribers]) {
     try {
-      await send(subscriber.chatId, leadText(lead), {
-        reply_markup: leadKeyboard(lead),
-      })
+      await send(subscriber.chatId, newLeadText(lead))
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error)
       console.error(`Notify ${subscriber.chatId} failed: ${message}`)
@@ -668,10 +593,7 @@ async function pollTelegram() {
   try {
     await telegram('deleteWebhook', { drop_pending_updates: false })
     await telegram('setMyCommands', {
-      commands: [
-        { command: 'start', description: 'Открыть панель менеджера' },
-        { command: 'help', description: 'Как пользоваться ботом' },
-      ],
+      commands: [{ command: 'start', description: 'Открыть заявки' }],
     })
     const me = await telegram('getMe')
     console.log(`Telegram bot @${me.username} is polling`)
