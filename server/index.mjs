@@ -295,20 +295,11 @@ async function answer(callbackQueryId, text) {
 
 async function sendLeadList(chatId, skipNewest = 0) {
   const leads = allLeadsChrono()
-  const sent = await send(chatId, listText(leads), { reply_markup: navKeyboard() })
-  if (!leads.length) return sent
-  try {
-    await telegram('editMessageReplyMarkup', {
-      chat_id: chatId,
-      message_id: sent.message_id,
-      reply_markup: listActionKeyboard(leads, skipNewest),
-    })
-  } catch {
-    await send(chatId, listText(leads), {
-      reply_markup: listActionKeyboard(leads, skipNewest),
-    })
-  }
-  return sent
+  return send(chatId, listText(leads), {
+    reply_markup: leads.length
+      ? listActionKeyboard(leads, skipNewest)
+      : navKeyboard(),
+  })
 }
 
 async function authorize(from) {
