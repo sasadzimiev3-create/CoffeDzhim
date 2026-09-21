@@ -32,6 +32,7 @@ import {
   siteSocials,
   type SocialNetwork,
 } from './data/site'
+import { sendLead, type LeadSource } from './lib/leads'
 
 type View =
   | 'home'
@@ -153,8 +154,10 @@ const promoSlides = [
 ] as const
 
 function getViewFromHash(): View {
-  const hash = window.location.hash.replace('#', '') as View
-  return views.includes(hash) ? hash : 'home'
+  const hash = window.location.hash.replace('#', '')
+  if (hash === 'service-request' || hash === 'service-page') return 'service'
+  if (hash === 'contacts-page') return 'contacts'
+  return views.includes(hash as View) ? (hash as View) : 'home'
 }
 
 function SocialIcon({ network }: { network: SocialNetwork }) {
@@ -857,6 +860,133 @@ function EquipmentView({
   )
 }
 
+function LeadForm({
+  source,
+  buttonLabel,
+}: {
+  source: LeadSource
+  buttonLabel: string
+}) {
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(
+    'idle',
+  )
+  const [error, setError] = useState('')
+
+  const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+    setStatus('sending')
+    setError('')
+    try {
+      await sendLead({
+        source,
+        name: String(data.get('name') || ''),
+        phone: String(data.get('phone') || ''),
+        contact: String(data.get('contact') || ''),
+        comment: String(data.get('comment') || ''),
+        serviceType: String(data.get('serviceType') || ''),
+      })
+      form.reset()
+      setStatus('sent')
+    } catch (err) {
+      setStatus('error')
+      setError(
+        err instanceof Error ? err.message : 'Не удалось отправить заявку',
+      )
+    }
+  }
+
+  return (
+    <form
+      className="contact-form"
+      onSubmit={onSubmit}
+      onInput={() => {
+        if (status === 'sent' || status === 'error') setStatus('idle')
+      }}
+      data-reveal
+    >
+      {source === 'service' && (
+        <label>
+          <span>Что нужно</span>
+          <select name="serviceType" defaultValue="">
+            <option value="">Выберите услугу</option>
+            {serviceItems.map((item) => (
+              <option key={item} value={item}>
+                {item}
+              </option>
+            ))}
+            <option value="Другое">Другое</option>
+          </select>
+        </label>
+      )}
+      <label>
+        <span>Имя</span>
+        <input
+          name="name"
+          type="text"
+          required
+          minLength={2}
+          maxLength={80}
+          placeholder="Как к вам обращаться?"
+        />
+      </label>
+      <label>
+        <span>Телефон</span>
+        <input
+          name="phone"
+          type="tel"
+          required
+          placeholder="+7 (___) ___-__-__"
+        />
+      </label>
+      <label>
+        <span>Telegram / Email</span>
+        <input
+          name="contact"
+          type="text"
+          maxLength={120}
+          placeholder="@username или mail@example.ru"
+        />
+      </label>
+      <label>
+        <span>Комментарий</span>
+        <textarea
+          name="comment"
+          rows={3}
+          maxLength={1000}
+          placeholder={
+            source === 'service'
+              ? 'Модель машины, что случилось, когда удобно приехать'
+              : 'Расскажите, что вам нужно'
+          }
+        />
+      </label>
+      <button
+        className="button button--dark button--wide"
+        type="submit"
+        disabled={status === 'sending'}
+      >
+        {status === 'sending' ? 'Отправляем…' : buttonLabel}
+        <ArrowUpRight size={18} />
+      </button>
+      {status === 'sent' ? (
+        <p className="form-success">
+          <Check size={17} />
+          Заявка отправлена. Менеджер получил её в Telegram и свяжется с вами.
+        </p>
+      ) : status === 'error' ? (
+        <p className="form-error">{error}</p>
+      ) : (
+        <p className="form-note">
+          Заявка сразу придёт менеджеру в Telegram — с вашими данными и временем
+          обращения.
+        </p>
+      )}
+    </form>
+  )
+}
+
 function ComingSoonView({
   eyebrow,
   title,
@@ -888,7 +1018,8 @@ function ComingSoonView({
 
 function ServiceView() {
   return (
-    <section className="service-section" id="service-page">
+    <>
+      <section className="service-section" id="service-page">
       <div className="service-image" data-reveal>
         <img
           src="/assets/service-coffee-machine.jpg"
@@ -924,22 +1055,41 @@ function ServiceView() {
             </div>
           ))}
         </div>
-        <a className="button button--copper" href="#contacts">
-          Обсудить обслуживание
+        <a
+          className="button button--copper"
+          href="#service-request"
+          onClick={(event) => {
+            event.preventDefault()
+            document
+              .getElementById('service-request')
+              ?.scrollIntoView({ behavior: 'smooth' })
+          }}
+        >
+          Оставить заявку
           <ArrowRight size={18} />
         </a>
       </div>
     </section>
+      <section className="service-request" id="service-request">
+        <div className="service-request__intro" data-reveal>
+          <p className="eyebrow">Заявка на сервис</p>
+          <h2>
+            Оставьте заявку
+            <br />
+            на <em>обслуживание</em>
+          </h2>
+          <p>
+            Напишите, что случилось с машиной — менеджер получит заявку сразу в
+            Telegram, с вашими контактами и временем обращения.
+          </p>
+        </div>
+        <LeadForm source="service" buttonLabel="Отправить заявку" />
+      </section>
+    </>
   )
 }
 
-function ContactsView({
-  submitted,
-  onSubmit,
-}: {
-  submitted: boolean
-  onSubmit: (event: FormEvent<HTMLFormElement>) => void
-}) {
+function ContactsView() {
   return (
     <section className="contact-section" id="contacts-page">
       <div className="contact-intro" data-reveal>
@@ -976,46 +1126,7 @@ function ContactsView({
         </div>
       </div>
 
-      <form className="contact-form" onSubmit={onSubmit} data-reveal>
-        <label>
-          <span>Имя</span>
-          <input name="name" type="text" placeholder="Как к вам обращаться?" />
-        </label>
-        <label>
-          <span>Телефон</span>
-          <input name="phone" type="tel" placeholder="+7 (___) ___-__-__" />
-        </label>
-        <label>
-          <span>Telegram / Email</span>
-          <input
-            name="contact"
-            type="text"
-            placeholder="@username или mail@example.ru"
-          />
-        </label>
-        <label>
-          <span>Комментарий</span>
-          <textarea
-            name="comment"
-            rows={3}
-            placeholder="Расскажите, что вам нужно"
-          />
-        </label>
-        <button className="button button--dark button--wide" type="submit">
-          Получить консультацию
-          <ArrowUpRight size={18} />
-        </button>
-        {submitted ? (
-          <p className="form-success">
-            <Check size={17} />
-            Демо-форма работает. Отправка будет подключена позже.
-          </p>
-        ) : (
-          <p className="form-note">
-            Пока это демонстрационная форма — данные никуда не отправляются.
-          </p>
-        )}
-      </form>
+      <LeadForm source="contacts" buttonLabel="Получить консультацию" />
     </section>
   )
 }
@@ -1025,17 +1136,29 @@ function App() {
     useState<CatalogProduct | null>(null)
   const [view, setView] = useState<View>(getViewFromHash())
   const [menuOpen, setMenuOpen] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
 
   useEffect(() => {
     const handleHashChange = () => {
       setView(getViewFromHash())
       setMenuOpen(false)
-      window.scrollTo({ top: 0, behavior: 'auto' })
     }
     window.addEventListener('hashchange', handleHashChange)
     return () => window.removeEventListener('hashchange', handleHashChange)
   }, [])
+
+  useEffect(() => {
+    const hash = window.location.hash.replace('#', '')
+    const frame = window.requestAnimationFrame(() => {
+      if (hash === 'service-request') {
+        document
+          .getElementById('service-request')
+          ?.scrollIntoView({ behavior: 'smooth' })
+        return
+      }
+      window.scrollTo({ top: 0, behavior: 'auto' })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [view])
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -1052,11 +1175,6 @@ function App() {
   }, [view])
 
   const closeMenu = () => setMenuOpen(false)
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    setSubmitted(true)
-  }
 
   return (
     <main>
@@ -1085,9 +1203,7 @@ function App() {
         />
       )}
       {view === 'service' && <ServiceView />}
-      {view === 'contacts' && (
-        <ContactsView submitted={submitted} onSubmit={handleSubmit} />
-      )}
+      {view === 'contacts' && <ContactsView />}
 
       <footer className="site-footer">
         <div className="footer-brand">

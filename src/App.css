@@ -232,6 +232,12 @@ main {
   background: #9a5730;
 }
 
+.button:disabled {
+  opacity: 0.55;
+  pointer-events: none;
+  transform: none;
+}
+
 .button--wide {
   width: 100%;
   justify-content: space-between;
@@ -1375,6 +1381,23 @@ main {
   width: max-content;
 }
 
+.service-request {
+  display: grid;
+  padding: var(--section-pad) var(--page-pad);
+  grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.8fr);
+  gap: clamp(40px, 8vw, 120px);
+  background: var(--paper);
+  border-top: 1px solid var(--line);
+}
+
+.service-request__intro > p:not(.eyebrow) {
+  max-width: 520px;
+  margin: 22px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.35;
+}
+
 .coming-soon {
   display: grid;
   padding: clamp(64px, 8vw, 120px) var(--page-pad) var(--section-pad);
@@ -1520,7 +1543,8 @@ a.social-links__item:hover {
 }
 
 .contact-form input,
-.contact-form textarea {
+.contact-form textarea,
+.contact-form select {
   width: 100%;
   padding: 8px 0 12px;
   border-bottom: 1px solid var(--line-strong);
@@ -1532,18 +1556,35 @@ a.social-links__item:hover {
   resize: vertical;
 }
 
+.contact-form select {
+  border-radius: 0;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+    linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+  background-position:
+    calc(100% - 12px) 18px,
+    calc(100% - 6px) 18px;
+  background-size:
+    6px 6px,
+    6px 6px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
 .contact-form input::placeholder,
 .contact-form textarea::placeholder {
   color: rgba(26, 20, 16, 0.28);
 }
 
 .contact-form input:focus,
-.contact-form textarea:focus {
+.contact-form textarea:focus,
+.contact-form select:focus {
   border-color: var(--copper);
 }
 
 .form-note,
-.form-success {
+.form-success,
+.form-error {
   display: flex;
   margin: 14px 0 0;
   align-items: center;
@@ -1554,6 +1595,10 @@ a.social-links__item:hover {
 
 .form-success {
   color: #4f6840;
+}
+
+.form-error {
+  color: #8a3a2a;
 }
 
 /* ---------- Footer ---------- */
@@ -1975,6 +2020,7 @@ a.social-links__item:hover {
 
   .roaster-section,
   .service-section,
+  .service-request,
   .contact-section {
     grid-template-columns: 1fr;
   }

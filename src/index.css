@@ -49,13 +49,15 @@ body {
 body,
 button,
 input,
-textarea {
+textarea,
+select {
   font-family: var(--font-sans);
 }
 
 button,
 input,
-textarea {
+textarea,
+select {
   border: 0;
 }
 
