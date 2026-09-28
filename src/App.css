@@ -527,44 +527,6 @@ main {
   line-height: 1.65;
 }
 
-.home-stats {
-  display: grid;
-  padding: 0 var(--page-pad);
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  border-bottom: 1px solid var(--line);
-  background: var(--cream);
-}
-
-.home-stats > div {
-  padding: 28px 28px 28px 0;
-  border-right: 1px solid var(--line);
-}
-
-.home-stats > div:first-child {
-  padding-left: 0;
-}
-
-.home-stats > div:last-child {
-  border-right: 0;
-  padding-right: 0;
-}
-
-.home-stats strong {
-  display: block;
-  font-family: var(--font-serif);
-  font-size: 22px;
-  font-weight: 500;
-}
-
-.home-stats span {
-  display: block;
-  max-width: 280px;
-  margin-top: 8px;
-  color: var(--muted);
-  font-size: 13px;
-  line-height: 1.5;
-}
-
 /* ---------- Category cards ---------- */
 
 .category-nav {
@@ -1120,11 +1082,22 @@ main {
   margin: 18px 8px 0;
   padding-top: 12px;
   border-top: 1px solid var(--line);
+  align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
   color: var(--muted);
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.chemistry-card__bottom strong {
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+  white-space: nowrap;
 }
 
 .accessories-teaser {
@@ -2003,19 +1976,8 @@ a.social-links__item:hover {
     gap: 16px;
   }
 
-  .category-nav,
-  .home-stats {
+  .category-nav {
     grid-template-columns: 1fr;
-  }
-
-  .home-stats > div {
-    padding: 22px 0;
-    border-right: 0;
-    border-bottom: 1px solid var(--line);
-  }
-
-  .home-stats > div:last-child {
-    border-bottom: 0;
   }
 
   .roaster-section,

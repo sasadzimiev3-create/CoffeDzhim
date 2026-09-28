@@ -49,11 +49,7 @@ export const coffeeProducts: CatalogProduct[] = [
       { label: 'Высота', value: '850–1100 м' },
       { label: 'Оценка SCA', value: '82,00' },
     ],
-    variants: [
-      { label: '100 г', price: 324 },
-      { label: '250 г', price: 686 },
-      { label: '1 кг', price: 2192 },
-    ],
+    variants: [{ label: '1 кг', price: 2400 }],
     accent: '#a6613d',
   },
   {
@@ -76,11 +72,7 @@ export const coffeeProducts: CatalogProduct[] = [
       { label: 'Обработка', value: 'Натуральная' },
       { label: 'Урожай', value: '2023' },
     ],
-    variants: [
-      { label: '100 г', price: 315 },
-      { label: '250 г', price: 666 },
-      { label: '1 кг', price: 2106 },
-    ],
+    variants: [{ label: '1 кг', price: 2200 }],
     accent: '#80533e',
   },
   {
@@ -103,11 +95,7 @@ export const coffeeProducts: CatalogProduct[] = [
       { label: 'Обработка', value: 'Натуральная' },
       { label: 'Обжарка', value: 'Тёмная' },
     ],
-    variants: [
-      { label: '100 г', price: 316 },
-      { label: '250 г', price: 660 },
-      { label: '1 кг', price: 1975 },
-    ],
+    variants: [{ label: '1 кг', price: 2090 }],
     accent: '#3a2520',
   },
   {
@@ -132,11 +120,7 @@ export const coffeeProducts: CatalogProduct[] = [
       { label: 'Скрин', value: '17/18' },
       { label: 'Оценка Q-грейдера', value: '84' },
     ],
-    variants: [
-      { label: '100 г', price: 418 },
-      { label: '250 г', price: 832 },
-      { label: '1 кг', price: 2798 },
-    ],
+    variants: [{ label: '1 кг', price: 2798 }],
     accent: '#6f3034',
   },
   {
@@ -162,8 +146,8 @@ export const coffeeProducts: CatalogProduct[] = [
       { label: 'Эфиопия Гуджи Гигеса', value: '5 шт.' },
     ],
     variants: [
-      { label: 'Коробка, 30 шт.', price: 2720 },
-      { label: 'Зип-пакет, 30 шт.', price: 2720 },
+      { label: 'Коробка, 30 шт.', price: 1900 },
+      { label: 'Зип-пакет, 30 шт.', price: 1900 },
     ],
     accent: '#8d6a4a',
   },
@@ -251,26 +235,42 @@ export const equipmentProducts: CatalogProduct[] = [
   },
 ]
 
-export const chemistryProducts = [
+export type ChemistryProduct = {
+  code: string
+  name: string
+  image: string
+  volume: string
+  price: number
+}
+
+export const chemistryProducts: ChemistryProduct[] = [
   {
     code: 'P63',
     name: 'Порошок для удаления кофейных масел',
     image: '/assets/chemistry-p63-cutout.png',
+    volume: '1 кг',
+    price: 980,
   },
   {
     code: 'Д3',
     name: 'Универсальное средство для удаления накипи',
     image: '/assets/chemistry-d3-cutout.png',
+    volume: '1 л',
+    price: 980,
   },
   {
     code: 'M7',
     name: 'Средство для очистки молочных систем',
     image: '/assets/chemistry-m7-cutout.png',
+    volume: '1 л',
+    price: 980,
   },
   {
     code: 'T5',
     name: 'Таблетки для удаления кофейных масел',
     image: '/assets/chemistry-t5-cutout.png',
+    volume: '120 шт.',
+    price: 980,
   },
 ]
 

@@ -122,7 +122,6 @@ const promoSlides = [
   {
     id: 'futurmat',
     theme: 'machine',
-    kicker: 'Оборудование для бара',
     title: 'Futurmat Ottima Evo',
     text: 'Профессиональная эспрессо-машина для кофейни и ресторана. Подберём конфигурацию под ваш поток и поможем запустить бар.',
     cta: 'Смотреть модель',
@@ -270,7 +269,7 @@ function PromoSlider() {
             aria-hidden={slide.id !== promoSlides[index].id}
           >
             <div className="promo-slide__copy">
-              <p className="eyebrow">{slide.kicker}</p>
+              {'kicker' in slide ? <p className="eyebrow">{slide.kicker}</p> : null}
               <h2>{slide.title}</h2>
               {'price' in slide && slide.price ? (
                 <strong className="promo-slide__price">{slide.price}</strong>
@@ -417,6 +416,12 @@ function ProductCard({
   onOpen: (product: CatalogProduct) => void
 }) {
   const startingPrice = product.variants?.[0]?.price
+  const variantPrices = product.variants?.map((variant) => variant.price) ?? []
+  const fromPrefix =
+    variantPrices.length > 1 &&
+    Math.min(...variantPrices) !== Math.max(...variantPrices)
+      ? 'от '
+      : ''
   const imageMode = product.imageMode ?? 'cutout'
   return (
     <article
@@ -452,7 +457,7 @@ function ProductCard({
             <span>Подробнее</span>
             <strong>
               {startingPrice
-                ? `от ${formatPrice(startingPrice)}`
+                ? `${fromPrefix}${formatPrice(startingPrice)}`
                 : product.price
                   ? formatPrice(product.price)
                   : product.priceLabel}
@@ -525,7 +530,7 @@ function ProductModal({
             ))}
           </div>
 
-          {product.variants && (
+          {product.variants && product.variants.length > 1 ? (
             <div className="variant-picker">
               <p>Выберите формат</p>
               <div>
@@ -541,10 +546,14 @@ function ProductModal({
                 ))}
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="modal-price">
-            <span>Актуальная цена</span>
+            <span>
+              {product.variants?.length === 1
+                ? `Актуальная цена · ${product.variants[0].label}`
+                : 'Актуальная цена'}
+            </span>
             <strong>
               {selectedVariant
                 ? formatPrice(selectedVariant.price)
@@ -587,21 +596,6 @@ function HomeView({
     <>
       <section className="promo-hero" id="top">
         <PromoSlider />
-      </section>
-
-      <section className="home-stats" aria-label="Направления">
-        <div>
-          <strong>Кофе Ingresso</strong>
-          <span>Эспрессо, фильтр и дрип с понятными профилями вкуса</span>
-        </div>
-        <div>
-          <strong>Оборудование</strong>
-          <span>Машины и барная техника под поток заведения</span>
-        </div>
-        <div>
-          <strong>Сервис</strong>
-          <span>Аудит, чистка, настройка и ремонт без простоя бара</span>
-        </div>
       </section>
 
       <section className="catalog-index" id="home-catalog">
@@ -780,8 +774,10 @@ function ChemistryView() {
               <p className="eyebrow">Профессиональный уход</p>
               <h3>{product.name}</h3>
               <div className="chemistry-card__bottom">
-                <span>{product.code}</span>
-                <span>Данные уточняются</span>
+                <span>
+                  {product.code} · {product.volume}
+                </span>
+                <strong>{formatPrice(product.price)}</strong>
               </div>
             </article>
           ))}
