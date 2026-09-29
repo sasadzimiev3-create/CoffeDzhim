@@ -14,7 +14,6 @@ import {
   Phone,
   Plus,
   Settings,
-  Sparkles,
   Wrench,
   X,
 } from 'lucide-react'
@@ -73,11 +72,13 @@ const catalogCategories: {
   description: string
   image?: string
   imageMode?: 'cutout' | 'photo'
+  logo?: string
 }[] = [
   {
     id: 'coffee',
     number: '01',
-    name: 'Кофе Ingresso',
+    name: 'Ingresso',
+    logo: '/assets/ingresso-logo.png',
     count: '5 позиций',
     available: true,
     image: '/assets/coffee-brazil-cutout.png',
@@ -118,16 +119,27 @@ const catalogCategories: {
   },
 ]
 
+const partners = [
+  { name: 'Ingresso', logo: '/assets/partners/ingresso.png', fit: 'mark' },
+  { name: 'Futurmat', logo: '/assets/partners/futurmat.svg', fit: 'word' },
+  { name: 'Eureka', logo: '/assets/partners/eureka.png', fit: 'mark' },
+  { name: 'WMF', logo: '/assets/partners/wmf.svg', fit: 'mark' },
+  { name: 'Jetinno', logo: '/assets/partners/jetinno.png', fit: 'word' },
+  { name: 'Barista Line', logo: '/assets/partners/barista-line.png', fit: 'wide' },
+] as const
+
 const promoSlides = [
   {
     id: 'futurmat',
     theme: 'machine',
+    kicker: '2 группы · Tall LED',
     title: 'Futurmat Ottima Evo',
-    text: 'Профессиональная эспрессо-машина для кофейни и ресторана. Подберём конфигурацию под ваш поток и поможем запустить бар.',
+    price: '289 000 ₽',
+    text: 'Для плотного потока и стаканов «с собой». Латунные группы держат температуру в час пик, рабочая зона подсвечена. Доставка по СПб и установка — бесплатно.',
     cta: 'Смотреть модель',
     href: '#equipment',
-    image: '/assets/equipment-futurmat-cutout.png',
-    imageAlt: 'Кофемашина Futurmat Ottima Evo',
+    image: '/assets/equipment-ottima-evo-2g-cutout.png',
+    imageAlt: 'Кофемашина Futurmat Ottima Evo 2GR Tall LED',
   },
   {
     id: 'coffee-offer',
@@ -617,12 +629,21 @@ function HomeView({
               key={category.id}
               href={`#${category.id}`}
               className={`category-nav__item ${
-                category.available ? '' : 'category-nav__item--soon'
-              }`}
+                category.logo ? 'category-nav__item--brand' : ''
+              } ${category.available ? '' : 'category-nav__item--soon'}`}
             >
               <div className="category-nav__copy">
                 <span className="category-nav__num">{category.number}</span>
-                <h3>{category.name}</h3>
+                <h3>
+                  {category.logo ? (
+                    <img
+                      className="category-nav__logo"
+                      src={category.logo}
+                      alt=""
+                    />
+                  ) : null}
+                  {category.name}
+                </h3>
                 <p>{category.description}</p>
                 <span className="category-nav__count">{category.count}</span>
               </div>
@@ -665,32 +686,32 @@ function HomeView({
         </div>
       </section>
 
-      <section className="roaster-section" id="roaster">
-        <div className="roaster-portrait" data-reveal>
-          <div className="portrait-placeholder">
-            <span>Фото</span>
-            <p>Место для портрета обжарщика</p>
+      <section className="partners" id="partners">
+        <div className="section-heading" data-reveal>
+          <div>
+            <p className="eyebrow">03 / Партнёры</p>
+            <h2>
+              Бренды, с которыми
+              <br />
+              <em>работаем</em>
+            </h2>
           </div>
-          <p className="image-caption">Roaster portrait / coming soon</p>
-        </div>
-        <div className="roaster-copy" data-reveal>
-          <p className="eyebrow">03 / История</p>
-          <h2>
-            Обжарщик —<br />
-            <em>автор вкуса</em>
-          </h2>
-          <p className="large-copy">
-            Здесь появится история человека, который отвечает за профиль,
-            баланс и характер каждой обжарки.
+          <p>
+            Обжарка, машины, кофемолки и химия — марки, на которых собираем
+            бар.
           </p>
-          <div className="placeholder-note">
-            <Sparkles size={19} />
-            <p>
-              Имя, фотография и авторский текст будут добавлены после
-              согласования.
-            </p>
-          </div>
         </div>
+        <ul className="partners__grid" data-reveal>
+          {partners.map((partner) => (
+            <li key={partner.name}>
+              <img
+                className={`partners__logo partners__logo--${partner.fit}`}
+                src={partner.logo}
+                alt={partner.name}
+              />
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="home-cta" data-reveal>
