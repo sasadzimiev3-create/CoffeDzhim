@@ -1658,6 +1658,7 @@ a.social-links__item:hover {
 
 /* ---------- Modal ---------- */
 
+html:has(body.modal-open),
 .modal-open {
   overflow: hidden;
 }
@@ -1679,8 +1680,10 @@ a.social-links__item:hover {
   position: relative;
   display: grid;
   width: min(1080px, 100%);
+  height: min(840px, calc(100svh - 48px));
   max-height: min(840px, calc(100svh - 48px));
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  grid-template-rows: minmax(0, 1fr);
   overflow: hidden;
   border-radius: 20px;
   background: var(--cream);
@@ -1753,8 +1756,10 @@ a.social-links__item:hover {
 }
 
 .product-modal__content {
+  min-height: 0;
   padding: clamp(36px, 4.6vw, 64px);
   overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .product-modal__content h2 {
@@ -2055,8 +2060,10 @@ a.social-links__item:hover {
 
   .product-modal {
     display: block;
+    height: auto;
     max-height: calc(100svh - 24px);
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .product-modal__visual {

@@ -177,7 +177,7 @@ export const equipmentProducts: CatalogProduct[] = [
       { label: 'Питание', value: '230 В / 50–60 Гц' },
       { label: 'Мощность', value: '2800 Вт' },
     ],
-    priceLabel: 'Цена по запросу',
+    price: 289000,
     accent: '#736c64',
   },
   {
