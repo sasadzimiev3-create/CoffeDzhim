@@ -156,26 +156,26 @@ export const coffeeProducts: CatalogProduct[] = [
 export const equipmentProducts: CatalogProduct[] = [
   {
     id: 'futurmat-ottima',
-    name: 'Futurmat Ottima Evo',
-    shortName: 'Ottima Evo',
+    name: 'Quality Espresso Futurmat Ottima Evo 2G',
+    shortName: 'Ottima Evo 2G',
     kind: 'Профессиональная эспрессо-машина',
-    image: '/assets/equipment-futurmat-cutout.png',
+    image: '/assets/equipment-ottima-evo-2g-cutout.png',
     imageMode: 'cutout',
-    source: 'https://futurmat.evocagroup.com/en/node/2174',
+    source: 'https://futurmat.evocagroup.com/en/products/ottima-evo',
     sourceLabel: 'Futurmat / Evoca Group',
     lead:
       'Надёжная барная машина с высокой термостабильностью и лаконичным дизайном.',
     description:
-      'Медный бойлер, независимые термосифонные теплообменники для каждой группы, электронный контроль уровня воды и четыре программируемые дозы.',
-    notes: ['HoReCa', 'Термостабильность', '4 дозы'],
+      'Две группы, медный бойлер и независимые термосифонные теплообменники. Электронный контроль уровня воды, четыре программируемые дозы на группу и подсветка рабочей зоны в версии Tall.',
+    notes: ['2 группы', 'Tall LED', '4 дозы'],
     specs: [
-      { label: 'Версия', value: 'Ottima Evo 1GR' },
-      { label: 'Группы', value: '1' },
-      { label: 'Габариты', value: '450 × 420 × 520 мм' },
-      { label: 'Вес', value: '35 кг' },
-      { label: 'Бойлер', value: '5 л' },
+      { label: 'Версия', value: 'Ottima Evo 2GR Tall' },
+      { label: 'Группы', value: '2' },
+      { label: 'Габариты', value: '710 × 460 × 520 мм' },
+      { label: 'Вес', value: '51 кг' },
+      { label: 'Бойлер', value: '11 л' },
       { label: 'Питание', value: '230 В / 50–60 Гц' },
-      { label: 'Мощность', value: '2700 Вт' },
+      { label: 'Мощность', value: '2800 Вт' },
     ],
     priceLabel: 'Цена по запросу',
     accent: '#736c64',
@@ -202,7 +202,7 @@ export const equipmentProducts: CatalogProduct[] = [
       { label: 'Вес', value: '6,6 кг' },
       { label: 'Напряжение', value: '220 В' },
     ],
-    price: 43175,
+    price: 53000,
     accent: '#77706a',
   },
   {
@@ -218,7 +218,7 @@ export const equipmentProducts: CatalogProduct[] = [
     lead:
       'Коммерческая машина высокой производительности для точек с большим потоком.',
     description:
-      'Зеркальная передняя панель из нержавеющей стали, трёхцветная подсветка, съёмный бункер и сенсорный экран 10,1 дюйма.',
+      'Зеркальная передняя панель из нержавеющей стали, трёхцветная подсветка, съёмный бункер и сенсорный экран 10,1 дюйма. Внутренний бак для воды — 8 л.',
     notes: ['До 100 чашек/день', 'Свежое молоко', '10,1″'],
     specs: [
       { label: 'Производительность', value: '100 чашек/день' },
@@ -226,11 +226,12 @@ export const equipmentProducts: CatalogProduct[] = [
       { label: 'Вес', value: '22 кг' },
       { label: 'Мощность', value: '3500 Вт' },
       { label: 'Бункер зерна', value: '1200 г × 1' },
+      { label: 'Бак для воды', value: '8 л, внутренний' },
       { label: 'Экран', value: '10,1″ сенсорный' },
       { label: 'Высота носика', value: '105–180 мм' },
       { label: 'Подключение', value: 'Wi‑Fi, 4G опционально' },
     ],
-    priceLabel: 'Цена по запросу',
+    price: 127000,
     accent: '#84613f',
   },
 ]

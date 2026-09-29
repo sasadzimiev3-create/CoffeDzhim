@@ -1,4 +1,4 @@
-export type LeadSource = 'service' | 'contacts'
+export type LeadSource = 'service' | 'contacts' | 'purchase'
 
 export type LeadPayload = {
   source: LeadSource
@@ -7,6 +7,8 @@ export type LeadPayload = {
   contact?: string
   comment?: string
   serviceType?: string
+  product?: string
+  priceLabel?: string
 }
 
 export async function sendLead(payload: LeadPayload) {

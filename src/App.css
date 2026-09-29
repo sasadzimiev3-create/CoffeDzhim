@@ -340,6 +340,11 @@ main {
   letter-spacing: -0.04em;
 }
 
+.promo-slide--machine .promo-slide__copy h2 {
+  font-size: clamp(32px, 3.5vw, 54px);
+  line-height: 1.02;
+}
+
 .promo-slide__price {
   display: block;
   margin-top: 14px;
@@ -1219,9 +1224,9 @@ main {
 .equipment-card__copy h3 {
   margin: 0 0 10px;
   font-family: var(--font-serif);
-  font-size: clamp(26px, 2.4vw, 36px);
+  font-size: clamp(22px, 2vw, 32px);
   font-weight: 500;
-  line-height: 1.05;
+  line-height: 1.08;
   letter-spacing: -0.03em;
 }
 
@@ -1232,7 +1237,36 @@ main {
   line-height: 1.55;
 }
 
-.equipment-card__copy button {
+.equipment-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.equipment-card__price {
+  display: flex;
+  margin: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.equipment-card__price span {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.equipment-card__price strong {
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+
+.equipment-card__more {
   display: flex;
   width: 100%;
   padding: 14px 0 0;
@@ -1245,11 +1279,11 @@ main {
   text-transform: uppercase;
 }
 
-.equipment-card__copy button svg {
+.equipment-card__more svg {
   transition: transform 220ms ease;
 }
 
-.equipment-card__copy button:hover svg {
+.equipment-card__more:hover svg {
   transform: translate(2px, -2px);
 }
 
@@ -1805,6 +1839,52 @@ a.social-links__item:hover {
   justify-content: space-between;
 }
 
+.product-modal__buy {
+  margin-top: 22px;
+}
+
+.purchase-modal {
+  position: relative;
+  width: min(560px, 100%);
+  max-height: min(840px, calc(100svh - 48px));
+  padding: clamp(28px, 4vw, 44px);
+  overflow: auto;
+  border-radius: 20px;
+  background: var(--cream);
+  box-shadow: 0 40px 90px rgba(0, 0, 0, 0.35);
+  animation: modal-rise 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.purchase-modal h2 {
+  margin: 10px 56px 0 0;
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3vw, 40px);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+}
+
+.purchase-modal__price {
+  margin: 14px 0 0;
+  font-family: var(--font-serif);
+  font-size: 32px;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.purchase-modal__hint {
+  margin: 14px 0 22px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.purchase-modal .contact-form {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 .modal-price strong {
   font-family: var(--font-serif);
   font-size: 28px;
@@ -2067,10 +2147,15 @@ a.social-links__item:hover {
     align-items: end;
   }
 
-  .product-modal {
+  .product-modal,
+  .purchase-modal {
     width: 100%;
     max-height: 94svh;
     border-radius: 20px 20px 0 0;
+  }
+
+  .purchase-modal {
+    padding: 28px 20px 40px;
   }
 
   .product-modal__content {

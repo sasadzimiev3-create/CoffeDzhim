@@ -92,7 +92,7 @@ const catalogCategories: {
     name: 'Оборудование',
     count: '3 позиции',
     available: true,
-    image: '/assets/equipment-futurmat-cutout.png',
+    image: '/assets/equipment-ottima-evo-2g-cutout.png',
     imageMode: 'cutout',
     description:
       'Профессиональные кофемашины, суперавтоматы и барное оборудование для кофейни, ресторана и точки с высокой проходимостью.',
@@ -133,13 +133,13 @@ const promoSlides = [
     id: 'futurmat',
     theme: 'machine',
     kicker: '2 группы · Tall LED',
-    title: 'Futurmat Ottima Evo',
+    title: 'Quality Espresso Futurmat Ottima Evo 2G',
     price: '289 000 ₽',
     text: 'Для плотного потока и стаканов «с собой». Латунные группы держат температуру в час пик, рабочая зона подсвечена. Доставка по СПб и установка — бесплатно.',
     cta: 'Смотреть модель',
     href: '#equipment',
     image: '/assets/equipment-ottima-evo-2g-cutout.png',
-    imageAlt: 'Кофемашина Futurmat Ottima Evo 2GR Tall LED',
+    imageAlt: 'Кофемашина Quality Espresso Futurmat Ottima Evo 2G',
   },
   {
     id: 'coffee-offer',
@@ -481,12 +481,19 @@ function ProductCard({
   )
 }
 
+function productPriceText(product: CatalogProduct) {
+  if (product.price) return formatPrice(product.price)
+  return product.priceLabel ?? ''
+}
+
 function ProductModal({
   product,
   onClose,
+  onBuy,
 }: {
   product: CatalogProduct
   onClose: () => void
+  onBuy?: (product: CatalogProduct) => void
 }) {
   const [variantIndex, setVariantIndex] = useState(0)
   const selectedVariant = product.variants?.[variantIndex]
@@ -569,11 +576,20 @@ function ProductModal({
             <strong>
               {selectedVariant
                 ? formatPrice(selectedVariant.price)
-                : product.price
-                  ? formatPrice(product.price)
-                  : product.priceLabel}
+                : productPriceText(product)}
             </strong>
           </div>
+
+          {onBuy ? (
+            <button
+              className="button button--dark button--wide product-modal__buy"
+              type="button"
+              onClick={() => onBuy(product)}
+            >
+              Купить
+              <ArrowUpRight size={18} />
+            </button>
+          ) : null}
 
           <dl className="spec-list">
             {product.specs.map((spec) => (
@@ -827,8 +843,10 @@ function ChemistryView() {
 
 function EquipmentView({
   onOpen,
+  onBuy,
 }: {
   onOpen: (product: CatalogProduct) => void
+  onBuy: (product: CatalogProduct) => void
 }) {
   return (
     <>
@@ -864,10 +882,28 @@ function EquipmentView({
                   <h3>{product.name}</h3>
                   <p>{product.lead}</p>
                 </div>
-                <button type="button" onClick={() => onOpen(product)}>
-                  Подробнее
-                  <ArrowUpRight size={18} />
-                </button>
+                <div className="equipment-card__actions">
+                  <p className="equipment-card__price">
+                    <span>Цена</span>
+                    <strong>{productPriceText(product)}</strong>
+                  </p>
+                  <button
+                    className="equipment-card__more"
+                    type="button"
+                    onClick={() => onOpen(product)}
+                  >
+                    Подробнее
+                    <ArrowUpRight size={18} />
+                  </button>
+                  <button
+                    className="button button--dark button--wide"
+                    type="button"
+                    onClick={() => onBuy(product)}
+                  >
+                    Купить
+                    <ArrowUpRight size={18} />
+                  </button>
+                </div>
               </div>
             </article>
           ))}
@@ -880,9 +916,15 @@ function EquipmentView({
 function LeadForm({
   source,
   buttonLabel,
+  product,
+  priceLabel,
+  embedded = false,
 }: {
   source: LeadSource
   buttonLabel: string
+  product?: string
+  priceLabel?: string
+  embedded?: boolean
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(
     'idle',
@@ -903,6 +945,8 @@ function LeadForm({
         contact: String(data.get('contact') || ''),
         comment: String(data.get('comment') || ''),
         serviceType: String(data.get('serviceType') || ''),
+        product,
+        priceLabel,
       })
       form.reset()
       setStatus('sent')
@@ -921,7 +965,7 @@ function LeadForm({
       onInput={() => {
         if (status === 'sent' || status === 'error') setStatus('idle')
       }}
-      data-reveal
+      {...(embedded ? {} : { 'data-reveal': true })}
     >
       {source === 'service' && (
         <label>
@@ -975,7 +1019,9 @@ function LeadForm({
           placeholder={
             source === 'service'
               ? 'Модель машины, что случилось, когда удобно приехать'
-              : 'Расскажите, что вам нужно'
+              : source === 'purchase'
+                ? 'Доставка, установка или вопросы по модели'
+                : 'Расскажите, что вам нужно'
           }
         />
       </label>
@@ -990,17 +1036,78 @@ function LeadForm({
       {status === 'sent' ? (
         <p className="form-success">
           <Check size={17} />
-          Заявка отправлена. Менеджер получил её в Telegram и свяжется с вами.
+          {source === 'purchase'
+            ? 'Заявка на покупку отправлена. Менеджер получил её в Telegram и свяжется с вами.'
+            : 'Заявка отправлена. Менеджер получил её в Telegram и свяжется с вами.'}
         </p>
       ) : status === 'error' ? (
         <p className="form-error">{error}</p>
       ) : (
         <p className="form-note">
-          Заявка сразу придёт менеджеру в Telegram — с вашими данными и временем
-          обращения.
+          {source === 'purchase'
+            ? 'Заявка на покупку сразу придёт менеджеру в Telegram — с названием модели и вашими контактами.'
+            : 'Заявка сразу придёт менеджеру в Telegram — с вашими данными и временем обращения.'}
         </p>
       )}
     </form>
+  )
+}
+
+function PurchaseModal({
+  product,
+  onClose,
+}: {
+  product: CatalogProduct
+  onClose: () => void
+}) {
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose()
+    }
+
+    document.body.classList.add('modal-open')
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.body.classList.remove('modal-open')
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onClose])
+
+  const priceText = productPriceText(product)
+
+  return (
+    <div className="modal-backdrop" onMouseDown={onClose}>
+      <div
+        className="purchase-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="purchase-title"
+        onMouseDown={(event) => event.stopPropagation()}
+      >
+        <button
+          type="button"
+          className="modal-close"
+          onClick={onClose}
+          aria-label="Закрыть"
+        >
+          <X size={20} />
+        </button>
+        <p className="eyebrow">Покупка</p>
+        <h2 id="purchase-title">{product.name}</h2>
+        {priceText ? <p className="purchase-modal__price">{priceText}</p> : null}
+        <p className="purchase-modal__hint">
+          Оставьте контакты — менеджер получит заявку на покупку в Telegram и
+          свяжется с вами.
+        </p>
+        <LeadForm
+          source="purchase"
+          buttonLabel="Отправить заявку"
+          product={product.name}
+          priceLabel={priceText}
+          embedded
+        />
+      </div>
+    </div>
   )
 }
 
@@ -1151,6 +1258,8 @@ function ContactsView() {
 function App() {
   const [selectedProduct, setSelectedProduct] =
     useState<CatalogProduct | null>(null)
+  const [purchaseProduct, setPurchaseProduct] =
+    useState<CatalogProduct | null>(null)
   const [view, setView] = useState<View>(getViewFromHash())
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -1210,7 +1319,12 @@ function App() {
       {view === 'home' && <HomeView onOpen={setSelectedProduct} />}
       {view === 'coffee' && <CoffeeView onOpen={setSelectedProduct} />}
       {(view === 'chemistry' || view === 'accessories') && <ChemistryView />}
-      {view === 'equipment' && <EquipmentView onOpen={setSelectedProduct} />}
+      {view === 'equipment' && (
+        <EquipmentView
+          onOpen={setSelectedProduct}
+          onBuy={setPurchaseProduct}
+        />
+      )}
       {view === 'tea' && (
         <ComingSoonView
           eyebrow="Каталог · 03 / Чай"
@@ -1250,6 +1364,20 @@ function App() {
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
+          onBuy={
+            equipmentProducts.some((item) => item.id === selectedProduct.id)
+              ? (product) => {
+                  setSelectedProduct(null)
+                  setPurchaseProduct(product)
+                }
+              : undefined
+          }
+        />
+      )}
+      {purchaseProduct && (
+        <PurchaseModal
+          product={purchaseProduct}
+          onClose={() => setPurchaseProduct(null)}
         />
       )}
     </main>

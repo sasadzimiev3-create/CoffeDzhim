@@ -32,6 +32,7 @@ const OLD_NAV_BUTTONS = [
 const SOURCE_LABEL = {
   service: 'Сервис',
   contacts: 'Контакты',
+  purchase: 'Покупка',
 }
 
 const MIME = {
@@ -60,12 +61,14 @@ const hits = new Map()
  * @typedef {{
  *   id: number,
  *   createdAt: string,
- *   source: 'service' | 'contacts',
+ *   source: 'service' | 'contacts' | 'purchase',
  *   name: string,
  *   phone: string,
  *   contact: string,
  *   comment: string,
  *   serviceType: string,
+ *   product: string,
+ *   priceLabel: string,
  *   status: 'new' | 'in_progress' | 'done',
  * }} Lead
  */
@@ -202,13 +205,19 @@ function contactLink(contact) {
 
 function leadDataLines(lead) {
   const source = SOURCE_LABEL[lead.source] || lead.source
-  const lines = [
-    lead.serviceType
-      ? `${escapeHtml(source)} · ${escapeHtml(lead.serviceType)}`
-      : escapeHtml(source),
-    escapeHtml(lead.name),
-    `<code>${escapeHtml(lead.phone)}</code>`,
-  ]
+  const lines = []
+  if (lead.source === 'purchase') {
+    lines.push(escapeHtml(source))
+    if (lead.product) lines.push(escapeHtml(lead.product))
+    if (lead.priceLabel) lines.push(escapeHtml(lead.priceLabel))
+  } else {
+    lines.push(
+      lead.serviceType
+        ? `${escapeHtml(source)} · ${escapeHtml(lead.serviceType)}`
+        : escapeHtml(source),
+    )
+  }
+  lines.push(escapeHtml(lead.name), `<code>${escapeHtml(lead.phone)}</code>`)
   if (lead.contact) lines.push(contactLink(lead.contact))
   if (lead.comment) lines.push('', escapeHtml(lead.comment))
   lines.push('', escapeHtml(formatWhen(lead.createdAt)))
@@ -216,11 +225,13 @@ function leadDataLines(lead) {
 }
 
 function leadText(lead) {
-  return [`Заявка №${lead.id}`, '', ...leadDataLines(lead)].join('\n')
+  const title = lead.source === 'purchase' ? `Покупка №${lead.id}` : `Заявка №${lead.id}`
+  return [title, '', ...leadDataLines(lead)].join('\n')
 }
 
 function newLeadText(lead) {
-  return ['Новая заявка', '', ...leadDataLines(lead)].join('\n')
+  const title = lead.source === 'purchase' ? 'Новая покупка' : 'Новая заявка'
+  return [title, '', ...leadDataLines(lead)].join('\n')
 }
 
 function allLeadsChrono() {
@@ -229,10 +240,10 @@ function allLeadsChrono() {
 
 function listText(leads) {
   if (!leads.length) return 'Заявок пока нет.'
-  const lines = leads.map(
-    (lead, index) =>
-      `${index + 1}. ${escapeHtml(lead.name)} · ${escapeHtml(lead.phone)} · ${escapeHtml(formatShort(lead.createdAt))}`,
-  )
+  const lines = leads.map((lead, index) => {
+    const kind = lead.source === 'purchase' ? 'Покупка · ' : ''
+    return `${index + 1}. ${kind}${escapeHtml(lead.name)} · ${escapeHtml(lead.phone)} · ${escapeHtml(formatShort(lead.createdAt))}`
+  })
   const full = lines.join('\n')
   if (full.length <= 3500) return full
   const keepNewest = 8
@@ -431,7 +442,9 @@ async function notifyLead(lead) {
 }
 
 function parseLead(body) {
-  const source = body.source === 'contacts' ? 'contacts' : 'service'
+  const source = ['contacts', 'purchase', 'service'].includes(body.source)
+    ? body.source
+    : 'service'
   const name = clip(body.name, 80)
   const phone = clip(body.phone, 40)
   const contact = clip(body.contact, 120)
@@ -440,9 +453,14 @@ function parseLead(body) {
     .trim()
     .slice(0, 1000)
   const serviceType = clip(body.serviceType, 80)
+  const product = clip(body.product, 160)
+  const priceLabel = clip(body.priceLabel, 40)
 
   if (name.length < 2) return { error: 'Укажите имя' }
   if (digitsPhone(phone).length < 10) return { error: 'Укажите телефон' }
+  if (source === 'purchase' && product.length < 2) {
+    return { error: 'Не указан товар' }
+  }
 
   return {
     lead: {
@@ -454,6 +472,8 @@ function parseLead(body) {
       contact,
       comment,
       serviceType: source === 'service' ? serviceType : '',
+      product: source === 'purchase' ? product : '',
+      priceLabel: source === 'purchase' ? priceLabel : '',
       status: 'new',
     },
   }
