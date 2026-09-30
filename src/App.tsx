@@ -153,15 +153,6 @@ const promoSlides = [
     image: '/assets/coffee-brazil-cutout.png',
     imageAlt: 'Кофе Ingresso Бразилия Серрадо',
   },
-  {
-    id: 'audit',
-    theme: 'audit',
-    kicker: 'Сервис и аудит',
-    title: 'Разберём ваш бар бесплатно',
-    text: 'Зерно, оборудование и сервис — покажем, где теряются вкус и маржа, и что стоит поменять в первую очередь.',
-    cta: 'Оставить заявку',
-    href: '#contacts',
-  },
 ] as const
 
 function getViewFromHash(): View {

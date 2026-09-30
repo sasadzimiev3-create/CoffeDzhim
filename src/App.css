@@ -314,12 +314,6 @@ main {
     linear-gradient(118deg, #2a1c14 0%, #3d281c 48%, #1c1410 100%);
 }
 
-.promo-slide--audit {
-  background:
-    linear-gradient(100deg, rgba(12, 9, 8, 0.88) 0%, rgba(12, 9, 8, 0.55) 46%, rgba(12, 9, 8, 0.28) 100%),
-    url('/assets/service-coffee-machine.jpg') right center / cover no-repeat;
-}
-
 .promo-slide__copy {
   position: relative;
   z-index: 2;
@@ -2015,15 +2009,6 @@ html:has(body.modal-open),
   .promo-slide--machine .promo-slide__visual img {
     width: min(92%, 520px);
     height: 90%;
-  }
-
-  .promo-slide--audit {
-    grid-template-rows: auto;
-    background-position: 70% center;
-  }
-
-  .promo-slide--audit .promo-slide__visual--empty {
-    display: none;
   }
 
   .promo-slide__copy h2 {
