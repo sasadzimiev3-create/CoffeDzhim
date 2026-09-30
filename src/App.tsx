@@ -151,12 +151,21 @@ const promoSlides = [
     theme: 'coffee',
     kicker: 'Кофе Ingresso',
     title: '10 кг кофе',
+    oldPrice: '22 220 ₽',
     price: '18 500 ₽',
-    text: 'Оптовая цена для HoReCa. Подскажем профиль под эспрессо, молоко и вашу карту напитков.',
+    priceExtra: '+ пачка дрип-пакетов',
+    offerLead: 'Мы',
+    points: [
+      'Продиагностируем оборудование и навыки команды',
+      'Настроим оборудование под новое зерно',
+      'Подсветим ошибки и выйдем на более высокий уровень качества',
+      'Составим ТТК',
+      'Бесплатно доставим по СПБ',
+    ],
     cta: 'Выбрать кофе',
     href: '#coffee',
-    image: '/assets/coffee-brazil-cutout.png',
-    imageAlt: 'Кофе Ingresso Бразилия Серрадо',
+    image: '/assets/coffee-ingresso-lineup-cutout.png',
+    imageAlt: 'Пачки кофе Ingresso',
   },
 ] as const
 
@@ -279,10 +288,29 @@ function PromoSlider() {
             <div className="promo-slide__copy">
               {'kicker' in slide ? <p className="eyebrow">{slide.kicker}</p> : null}
               <h2>{slide.title}</h2>
-              {'price' in slide && slide.price ? (
-                <strong className="promo-slide__price">{slide.price}</strong>
+              {'oldPrice' in slide && slide.oldPrice ? (
+                <span className="promo-slide__price promo-slide__price--old">{slide.oldPrice}</span>
               ) : null}
-              <p>{slide.text}</p>
+              {'price' in slide && slide.price ? (
+                <strong className="promo-slide__price">
+                  {slide.price}
+                  {'priceExtra' in slide && slide.priceExtra ? (
+                    <span className="promo-slide__price-extra"> {slide.priceExtra}</span>
+                  ) : null}
+                </strong>
+              ) : null}
+              {'points' in slide ? (
+                <div className="promo-slide__offer">
+                  <p className="promo-slide__offer-lead">{slide.offerLead}</p>
+                  <ul>
+                    {slide.points.map((point) => (
+                      <li key={point}>{point}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : (
+                <p>{slide.text}</p>
+              )}
               <a className="button button--light" href={slide.href}>
                 {slide.cta}
                 <ArrowRight size={18} />
