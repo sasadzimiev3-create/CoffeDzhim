@@ -19,12 +19,17 @@ import {
 } from 'lucide-react'
 import './App.css'
 import {
+  chemistryOrderUnit,
   chemistryProducts,
+  coffeeOrderUnit,
   coffeeProducts,
   equipmentProducts,
   formatPrice,
+  orderUnitLabel,
   serviceItems,
   type CatalogProduct,
+  type ChemistryProduct,
+  type OrderUnit,
 } from './data/catalog'
 import {
   siteContacts,
@@ -409,15 +414,74 @@ function PageHero({
   )
 }
 
+function QuantityStepper({
+  value,
+  unit,
+  onChange,
+}: {
+  value: number
+  unit: OrderUnit
+  onChange: (value: number) => void
+}) {
+  const label = orderUnitLabel(unit)
+  const setQuantity = (next: number) => {
+    if (!Number.isFinite(next)) return
+    onChange(Math.min(999, Math.max(1, Math.round(next))))
+  }
+
+  return (
+    <div className="qty">
+      <span className="qty__label">Количество</span>
+      <div className="qty__controls">
+        <button
+          type="button"
+          onClick={() => setQuantity(value - 1)}
+          disabled={value <= 1}
+          aria-label="Уменьшить количество"
+        >
+          −
+        </button>
+        <input
+          className="qty__input"
+          type="number"
+          inputMode="numeric"
+          min={1}
+          max={999}
+          value={value}
+          aria-label={`Количество, ${label}`}
+          onChange={(event) => {
+            const raw = event.target.value
+            if (raw === '') return
+            setQuantity(Number(raw))
+          }}
+        />
+        <span className="qty__unit">{label}</span>
+        <button
+          type="button"
+          onClick={() => setQuantity(value + 1)}
+          disabled={value >= 999}
+          aria-label="Увеличить количество"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function ProductCard({
   product,
   index,
   onOpen,
+  onBuy,
 }: {
   product: CatalogProduct
   index: number
   onOpen: (product: CatalogProduct) => void
+  onBuy: (product: CatalogProduct, quantity: number) => void
 }) {
+  const unit = coffeeOrderUnit(product)
+  const [quantity, setQuantity] = useState(1)
   const startingPrice = product.variants?.[0]?.price
   const variantPrices = product.variants?.map((variant) => variant.price) ?? []
   const fromPrefix =
@@ -426,6 +490,7 @@ function ProductCard({
       ? 'от '
       : ''
   const imageMode = product.imageMode ?? 'cutout'
+  const shownPrice = startingPrice ? startingPrice * quantity : null
   return (
     <article
       className={`product-card product-card--${imageMode}`}
@@ -459,8 +524,8 @@ function ProductCard({
           <div className="product-card__footer">
             <span>Подробнее</span>
             <strong>
-              {startingPrice
-                ? `${fromPrefix}${formatPrice(startingPrice)}`
+              {shownPrice
+                ? `${quantity > 1 ? '' : fromPrefix}${formatPrice(shownPrice)}`
                 : product.price
                   ? formatPrice(product.price)
                   : product.priceLabel}
@@ -468,6 +533,17 @@ function ProductCard({
           </div>
         </div>
       </button>
+      <div className="product-card__buy">
+        <QuantityStepper value={quantity} unit={unit} onChange={setQuantity} />
+        <button
+          className="button button--dark button--wide"
+          type="button"
+          onClick={() => onBuy(product, quantity)}
+        >
+          Купить
+          <ArrowUpRight size={18} />
+        </button>
+      </div>
     </article>
   )
 }
@@ -484,10 +560,17 @@ function ProductModal({
 }: {
   product: CatalogProduct
   onClose: () => void
-  onBuy?: (product: CatalogProduct) => void
+  onBuy: (
+    product: CatalogProduct,
+    order: { quantity: number; unitPrice: number },
+  ) => void
 }) {
   const [variantIndex, setVariantIndex] = useState(0)
+  const [quantity, setQuantity] = useState(1)
   const selectedVariant = product.variants?.[variantIndex]
+  const unit = product.variants ? coffeeOrderUnit(product) : null
+  const unitPrice = selectedVariant?.price ?? product.price ?? 0
+  const unitText = unit ? orderUnitLabel(unit) : ''
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -558,29 +641,34 @@ function ProductModal({
             </div>
           ) : null}
 
+          {unit ? (
+            <QuantityStepper value={quantity} unit={unit} onChange={setQuantity} />
+          ) : null}
+
           <div className="modal-price">
             <span>
-              {product.variants?.length === 1
-                ? `Актуальная цена · ${product.variants[0].label}`
+              {unit
+                ? `${quantity} ${unitText} · ${formatPrice(unitPrice)} / ${unitText}`
                 : 'Актуальная цена'}
             </span>
             <strong>
-              {selectedVariant
-                ? formatPrice(selectedVariant.price)
-                : productPriceText(product)}
+              {unit ? formatPrice(unitPrice * quantity) : productPriceText(product)}
             </strong>
           </div>
 
-          {onBuy ? (
-            <button
-              className="button button--dark button--wide product-modal__buy"
-              type="button"
-              onClick={() => onBuy(product)}
-            >
-              Купить
-              <ArrowUpRight size={18} />
-            </button>
-          ) : null}
+          <button
+            className="button button--dark button--wide product-modal__buy"
+            type="button"
+            onClick={() =>
+              onBuy(product, {
+                quantity: unit ? quantity : 1,
+                unitPrice,
+              })
+            }
+          >
+            Купить
+            <ArrowUpRight size={18} />
+          </button>
 
           <dl className="spec-list">
             {product.specs.map((spec) => (
@@ -608,8 +696,10 @@ function ProductModal({
 
 function HomeView({
   onOpen,
+  onBuy,
 }: {
   onOpen: (product: CatalogProduct) => void
+  onBuy: (product: CatalogProduct, quantity: number) => void
 }) {
   return (
     <>
@@ -687,6 +777,7 @@ function HomeView({
               product={product}
               index={index}
               onOpen={onOpen}
+              onBuy={onBuy}
               key={product.id}
             />
           ))}
@@ -741,8 +832,10 @@ function HomeView({
 
 function CoffeeView({
   onOpen,
+  onBuy,
 }: {
   onOpen: (product: CatalogProduct) => void
+  onBuy: (product: CatalogProduct, quantity: number) => void
 }) {
   return (
     <>
@@ -755,7 +848,7 @@ function CoffeeView({
             <em>Ingresso</em>
           </>
         }
-        description="Эспрессо, фильтр и дрип-форматы. Нажмите на карточку, чтобы посмотреть характеристики, фасовку и цену."
+        description="Эспрессо, фильтр и дрип-форматы для заведений. Выберите килограммы или упаковки и оставьте заявку на поставку."
       />
       <section className="coffee-section section-dark">
         <div className="product-grid">
@@ -764,6 +857,7 @@ function CoffeeView({
               product={product}
               index={index}
               onOpen={onOpen}
+              onBuy={onBuy}
               key={product.id}
             />
           ))}
@@ -773,7 +867,56 @@ function CoffeeView({
   )
 }
 
-function ChemistryView() {
+function ChemistryCard({
+  product,
+  index,
+  onBuy,
+}: {
+  product: ChemistryProduct
+  index: number
+  onBuy: (product: ChemistryProduct, quantity: number) => void
+}) {
+  const unit = chemistryOrderUnit(product)
+  const [quantity, setQuantity] = useState(1)
+
+  return (
+    <article className="chemistry-card" data-reveal>
+      <div className="chemistry-card__visual">
+        <span className="chemistry-card__number">0{index + 1}</span>
+        <img
+          src={product.image}
+          alt={`${product.name} ${product.code}`}
+          loading="lazy"
+        />
+      </div>
+      <p className="eyebrow">Профессиональный уход</p>
+      <h3>{product.name}</h3>
+      <div className="chemistry-card__foot">
+        <div className="chemistry-card__bottom">
+          <span>
+            {product.code} · {product.volume}
+          </span>
+          <strong>{formatPrice(product.price * quantity)}</strong>
+        </div>
+        <QuantityStepper value={quantity} unit={unit} onChange={setQuantity} />
+        <button
+          className="button button--dark button--wide"
+          type="button"
+          onClick={() => onBuy(product, quantity)}
+        >
+          Купить
+          <ArrowUpRight size={18} />
+        </button>
+      </div>
+    </article>
+  )
+}
+
+function ChemistryView({
+  onBuy,
+}: {
+  onBuy: (product: ChemistryProduct, quantity: number) => void
+}) {
   return (
     <>
       <PageHero
@@ -785,29 +928,17 @@ function ChemistryView() {
             <em>вкуса</em>
           </>
         }
-        description="Профессиональная химия для ухода за кофейным оборудованием. Аксессуары для бара появятся в этом же разделе."
+        description="Профессиональная химия для ухода за кофейным оборудованием. Количество — от 1 кг или 1 штуки. Аксессуары для бара появятся в этом же разделе."
       />
       <section className="chemistry-section section-dark">
         <div className="chemistry-grid">
           {chemistryProducts.map((product, index) => (
-            <article className="chemistry-card" key={product.code} data-reveal>
-              <div className="chemistry-card__visual">
-                <span className="chemistry-card__number">0{index + 1}</span>
-                <img
-                  src={product.image}
-                  alt={`${product.name} ${product.code}`}
-                  loading="lazy"
-                />
-              </div>
-              <p className="eyebrow">Профессиональный уход</p>
-              <h3>{product.name}</h3>
-              <div className="chemistry-card__bottom">
-                <span>
-                  {product.code} · {product.volume}
-                </span>
-                <strong>{formatPrice(product.price)}</strong>
-              </div>
-            </article>
+            <ChemistryCard
+              product={product}
+              index={index}
+              onBuy={onBuy}
+              key={product.code}
+            />
           ))}
         </div>
         <a className="accessories-teaser" href="#contacts" data-reveal>
@@ -1011,7 +1142,7 @@ function LeadForm({
             source === 'service'
               ? 'Модель машины, что случилось, когда удобно приехать'
               : source === 'purchase'
-                ? 'Доставка, установка или вопросы по модели'
+                ? 'Доставка, юрлицо или комментарий к заказу'
                 : 'Расскажите, что вам нужно'
           }
         />
@@ -1036,7 +1167,7 @@ function LeadForm({
       ) : (
         <p className="form-note">
           {source === 'purchase'
-            ? 'Заявка на покупку сразу придёт менеджеру в Telegram — с названием модели и вашими контактами.'
+            ? 'Заявка на покупку сразу придёт менеджеру в Telegram — с позицией, количеством и вашими контактами.'
             : 'Заявка сразу придёт менеджеру в Telegram — с вашими данными и временем обращения.'}
         </p>
       )}
@@ -1044,13 +1175,64 @@ function LeadForm({
   )
 }
 
+type PurchaseRequest = {
+  id: string
+  name: string
+  unitPrice: number
+  unit: OrderUnit | null
+  quantity: number
+}
+
+function coffeePurchase(
+  product: CatalogProduct,
+  quantity = 1,
+  unitPrice = product.variants?.[0]?.price ?? product.price ?? 0,
+): PurchaseRequest {
+  return {
+    id: product.id,
+    name: product.name,
+    unitPrice,
+    unit: product.variants ? coffeeOrderUnit(product) : null,
+    quantity,
+  }
+}
+
+function equipmentPurchase(product: CatalogProduct): PurchaseRequest {
+  return {
+    id: product.id,
+    name: product.name,
+    unitPrice: product.price ?? 0,
+    unit: null,
+    quantity: 1,
+  }
+}
+
+function chemistryPurchase(
+  product: ChemistryProduct,
+  quantity = 1,
+): PurchaseRequest {
+  return {
+    id: product.code,
+    name: `${product.name} (${product.code})`,
+    unitPrice: product.price,
+    unit: chemistryOrderUnit(product),
+    quantity,
+  }
+}
+
 function PurchaseModal({
-  product,
+  request,
   onClose,
 }: {
-  product: CatalogProduct
+  request: PurchaseRequest
   onClose: () => void
 }) {
+  const [quantity, setQuantity] = useState(request.quantity)
+
+  useEffect(() => {
+    setQuantity(request.quantity)
+  }, [request.id, request.quantity])
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') onClose()
@@ -1064,7 +1246,14 @@ function PurchaseModal({
     }
   }, [onClose])
 
-  const priceText = productPriceText(product)
+  const unitText = request.unit ? orderUnitLabel(request.unit) : ''
+  const total = request.unitPrice * (request.unit ? quantity : 1)
+  const priceText = request.unit
+    ? `${formatPrice(total)} за ${quantity} ${unitText}`
+    : formatPrice(request.unitPrice)
+  const productLine = request.unit
+    ? `${request.name} · ${quantity} ${unitText}`
+    : request.name
 
   return (
     <div className="modal-backdrop" onMouseDown={onClose}>
@@ -1084,8 +1273,20 @@ function PurchaseModal({
           <X size={20} />
         </button>
         <p className="eyebrow">Покупка</p>
-        <h2 id="purchase-title">{product.name}</h2>
-        {priceText ? <p className="purchase-modal__price">{priceText}</p> : null}
+        <h2 id="purchase-title">{request.name}</h2>
+        {request.unit ? (
+          <>
+            <p className="purchase-modal__unit">
+              {formatPrice(request.unitPrice)} / {unitText}
+            </p>
+            <QuantityStepper
+              value={quantity}
+              unit={request.unit}
+              onChange={setQuantity}
+            />
+          </>
+        ) : null}
+        <p className="purchase-modal__price">{priceText}</p>
         <p className="purchase-modal__hint">
           Оставьте контакты — менеджер получит заявку на покупку в Telegram и
           свяжется с вами.
@@ -1093,7 +1294,7 @@ function PurchaseModal({
         <LeadForm
           source="purchase"
           buttonLabel="Отправить заявку"
-          product={product.name}
+          product={productLine}
           priceLabel={priceText}
           embedded
         />
@@ -1249,8 +1450,8 @@ function ContactsView() {
 function App() {
   const [selectedProduct, setSelectedProduct] =
     useState<CatalogProduct | null>(null)
-  const [purchaseProduct, setPurchaseProduct] =
-    useState<CatalogProduct | null>(null)
+  const [purchaseRequest, setPurchaseRequest] =
+    useState<PurchaseRequest | null>(null)
   const [view, setView] = useState<View>(getViewFromHash())
   const [menuOpen, setMenuOpen] = useState(false)
 
@@ -1307,13 +1508,33 @@ function App() {
         </nav>
       </div>
 
-      {view === 'home' && <HomeView onOpen={setSelectedProduct} />}
-      {view === 'coffee' && <CoffeeView onOpen={setSelectedProduct} />}
-      {(view === 'chemistry' || view === 'accessories') && <ChemistryView />}
+      {view === 'home' && (
+        <HomeView
+          onOpen={setSelectedProduct}
+          onBuy={(product, quantity) =>
+            setPurchaseRequest(coffeePurchase(product, quantity))
+          }
+        />
+      )}
+      {view === 'coffee' && (
+        <CoffeeView
+          onOpen={setSelectedProduct}
+          onBuy={(product, quantity) =>
+            setPurchaseRequest(coffeePurchase(product, quantity))
+          }
+        />
+      )}
+      {(view === 'chemistry' || view === 'accessories') && (
+        <ChemistryView
+          onBuy={(product, quantity) =>
+            setPurchaseRequest(chemistryPurchase(product, quantity))
+          }
+        />
+      )}
       {view === 'equipment' && (
         <EquipmentView
           onOpen={setSelectedProduct}
-          onBuy={setPurchaseProduct}
+          onBuy={(product) => setPurchaseRequest(equipmentPurchase(product))}
         />
       )}
       {view === 'tea' && (
@@ -1330,7 +1551,10 @@ function App() {
       <footer className="site-footer">
         <div className="footer-brand">
           <BrandLogo footer />
-          <p>Кофе, оборудование и сервис для заведений, которым важен стабильный вкус.</p>
+          <p>
+            Сайт для B2B: кофе, оборудование и сервис для кофеен, ресторанов и
+            офисов.
+          </p>
         </div>
         <div className="footer-meta">
           <div className="footer-contacts">
@@ -1355,20 +1579,19 @@ function App() {
         <ProductModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
-          onBuy={
-            equipmentProducts.some((item) => item.id === selectedProduct.id)
-              ? (product) => {
-                  setSelectedProduct(null)
-                  setPurchaseProduct(product)
-                }
-              : undefined
-          }
+          onBuy={(product, order) => {
+            const request = equipmentProducts.some((item) => item.id === product.id)
+              ? equipmentPurchase(product)
+              : coffeePurchase(product, order.quantity, order.unitPrice)
+            setSelectedProduct(null)
+            setPurchaseRequest(request)
+          }}
         />
       )}
-      {purchaseProduct && (
+      {purchaseRequest && (
         <PurchaseModal
-          product={purchaseProduct}
-          onClose={() => setPurchaseProduct(null)}
+          request={purchaseRequest}
+          onClose={() => setPurchaseRequest(null)}
         />
       )}
     </main>

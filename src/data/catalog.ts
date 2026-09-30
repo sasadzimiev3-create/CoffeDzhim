@@ -286,3 +286,16 @@ export const serviceItems = [
 
 export const formatPrice = (price: number) =>
   new Intl.NumberFormat('ru-RU').format(price) + ' ₽'
+
+export type OrderUnit = 'kg' | 'piece'
+
+export const orderUnitLabel = (unit: OrderUnit) => (unit === 'kg' ? 'кг' : 'шт.')
+
+export function coffeeOrderUnit(product: CatalogProduct): OrderUnit {
+  const label = product.variants?.[0]?.label ?? ''
+  return /кг/.test(label) ? 'kg' : 'piece'
+}
+
+export function chemistryOrderUnit(product: ChemistryProduct): OrderUnit {
+  return /кг/.test(product.volume) ? 'kg' : 'piece'
+}
