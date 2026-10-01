@@ -181,31 +181,6 @@ export const equipmentProducts: CatalogProduct[] = [
     accent: '#736c64',
   },
   {
-    id: 'eureka-disco',
-    name: 'Eureka Disco',
-    shortName: 'Disco',
-    kind: 'Автоматический темпер',
-    image: '/assets/equipment-eureka-cutout.png',
-    imageMode: 'cutout',
-    source: 'https://entero.ru/item/321196',
-    sourceLabel: 'ENTERO',
-    lead:
-      'Точная и последовательная темперовка для интенсивной работы бара.',
-    description:
-      'Сенсорное управление и магнитный датчик автоматически определяют портафильтр. Поддерживается одинарная или двойная темперовка с регулировкой давления.',
-    notes: ['1,5 секунды', '10–30 кг', 'Италия'],
-    specs: [
-      { label: 'Давление', value: '10–30 кг' },
-      { label: 'Время темперовки', value: '1,5 сек.' },
-      { label: 'Диапазон дисков', value: '53–58,3 мм' },
-      { label: 'Габариты', value: '110 × 223 × 253 мм' },
-      { label: 'Вес', value: '6,6 кг' },
-      { label: 'Напряжение', value: '220 В' },
-    ],
-    price: 53000,
-    accent: '#77706a',
-  },
-  {
     id: 'jetinno-jl36a',
     name: 'Jetinno JL36A',
     shortName: 'JL36A',
@@ -233,6 +208,31 @@ export const equipmentProducts: CatalogProduct[] = [
     ],
     price: 127000,
     accent: '#84613f',
+  },
+  {
+    id: 'eureka-disco',
+    name: 'Eureka Disco',
+    shortName: 'Disco',
+    kind: 'Автоматический темпер',
+    image: '/assets/equipment-eureka-cutout.png',
+    imageMode: 'cutout',
+    source: 'https://entero.ru/item/321196',
+    sourceLabel: 'ENTERO',
+    lead:
+      'Точная и последовательная темперовка для интенсивной работы бара.',
+    description:
+      'Сенсорное управление и магнитный датчик автоматически определяют портафильтр. Поддерживается одинарная или двойная темперовка с регулировкой давления.',
+    notes: ['1,5 секунды', '10–30 кг', 'Италия'],
+    specs: [
+      { label: 'Давление', value: '10–30 кг' },
+      { label: 'Время темперовки', value: '1,5 сек.' },
+      { label: 'Диапазон дисков', value: '53–58,3 мм' },
+      { label: 'Габариты', value: '110 × 223 × 253 мм' },
+      { label: 'Вес', value: '6,6 кг' },
+      { label: 'Напряжение', value: '220 В' },
+    ],
+    price: 53000,
+    accent: '#77706a',
   },
 ]
 
