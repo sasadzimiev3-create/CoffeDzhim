@@ -613,6 +613,58 @@ main {
   box-shadow: 0 14px 32px rgba(26, 20, 16, 0.08);
 }
 
+.featured-coffee {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.featured-coffee__photo {
+  position: absolute;
+  z-index: 0;
+  inset: -20px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(23, 18, 16, 0.34) 0%,
+      rgba(23, 18, 16, 0.16) 42%,
+      rgba(23, 18, 16, 0.28) 100%
+    ),
+    url('/assets/roast-beans.jpg') center / cover no-repeat;
+  filter: blur(3px) saturate(1.04);
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.featured-coffee .section-heading,
+.featured-coffee .product-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.featured-coffee .section-heading h2,
+.featured-coffee .section-heading .eyebrow {
+  color: var(--cream);
+  text-shadow: 0 2px 16px rgba(23, 18, 16, 0.45);
+}
+
+.featured-coffee .section-heading h2 em {
+  color: var(--copper-soft);
+}
+
+.featured-coffee .text-link {
+  color: var(--cream);
+  border-bottom-color: rgba(250, 246, 240, 0.45);
+}
+
+.featured-coffee .text-link:hover {
+  border-bottom-color: var(--cream);
+}
+
+.featured-coffee .product-card {
+  box-shadow: 0 16px 36px rgba(23, 18, 16, 0.22);
+}
+
 .section-heading {
   display: flex;
   margin-bottom: clamp(40px, 5vw, 72px);

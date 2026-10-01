@@ -792,6 +792,7 @@ function HomeView({
       </section>
 
       <section className="featured-coffee">
+        <div className="featured-coffee__photo" aria-hidden="true" />
         <div className="section-heading" data-reveal>
           <div>
             <p className="eyebrow">02 / Обжарка</p>
