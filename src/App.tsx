@@ -140,7 +140,15 @@ const promoSlides = [
     kicker: '2 группы · Tall LED',
     title: 'Quality Espresso Futurmat Ottima Evo 2G',
     price: '289 000 ₽',
-    text: 'Для плотного потока и стаканов «с собой». Латунные группы держат температуру в час пик, рабочая зона подсвечена. Доставка по СПб и установка — бесплатно.',
+    text: 'Выбирая Futurmat, вы инвестируете в безотказную работу и выносливость. По длительности эксплуатации и ценовой эффективности эта кофемашина занимает лидирующие позиции в своём классе.',
+    offerLead: 'В подарок:',
+    points: [
+      'Диагностика оборудования',
+      'Настроим оборудование на новое зерно',
+      'Сделаем ТТК',
+      'Бесплатно привезем по СПБ и ЛО',
+      'Поможем выйти на новый уровень качества кофейных напитков',
+    ],
     cta: 'Смотреть модель',
     href: '#equipment',
     image: '/assets/equipment-ottima-evo-2g-cutout.png',
@@ -154,13 +162,12 @@ const promoSlides = [
     oldPrice: '22 220 ₽',
     price: '18 500 ₽',
     priceExtra: '+ пачка дрип-пакетов',
-    offerLead: 'Мы',
+    offerLead: 'Наши компетенции:',
     points: [
-      'Продиагностируем оборудование и навыки команды',
-      'Настроим оборудование под новое зерно',
-      'Подсветим ошибки и выйдем на более высокий уровень качества',
-      'Составим ТТК',
-      'Бесплатно доставим по СПБ',
+      'Бесплатная диагностика оборудования',
+      'Настроим оборудование на новое зерно',
+      'Сделаем ТТК',
+      'Бесплатно привезем по СПБ и ЛО',
     ],
     cta: 'Выбрать кофе',
     href: '#coffee',
@@ -299,6 +306,7 @@ function PromoSlider() {
                   ) : null}
                 </strong>
               ) : null}
+              {'text' in slide && slide.text ? <p>{slide.text}</p> : null}
               {'points' in slide ? (
                 <div className="promo-slide__offer">
                   <p className="promo-slide__offer-lead">{slide.offerLead}</p>
@@ -308,9 +316,7 @@ function PromoSlider() {
                     ))}
                   </ul>
                 </div>
-              ) : (
-                <p>{slide.text}</p>
-              )}
+              ) : null}
               <a className="button button--light" href={slide.href}>
                 {slide.cta}
                 <ArrowRight size={18} />

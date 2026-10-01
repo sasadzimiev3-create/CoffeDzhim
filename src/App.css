@@ -426,6 +426,21 @@ main {
   margin-top: 32px;
 }
 
+.promo-slide--machine .promo-slide__copy > p {
+  max-width: 520px;
+  margin-top: 14px;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.promo-slide--machine .promo-slide__offer {
+  margin-top: 16px;
+}
+
+.promo-slide--machine .promo-slide__copy .button {
+  margin-top: 22px;
+}
+
 .promo-slide__visual {
   position: relative;
   z-index: 1;
