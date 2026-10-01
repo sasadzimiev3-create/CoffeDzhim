@@ -617,6 +617,8 @@ main {
   position: relative;
   isolation: isolate;
   overflow: hidden;
+  padding-top: calc(var(--section-pad) * 0.9);
+  padding-bottom: calc(var(--section-pad) * 0.9);
 }
 
 .featured-coffee__photo {
@@ -661,8 +663,30 @@ main {
   border-bottom-color: var(--cream);
 }
 
+.featured-coffee .section-heading {
+  margin-bottom: clamp(28px, 3.4vw, 52px);
+}
+
 .featured-coffee .product-card {
   box-shadow: 0 16px 36px rgba(23, 18, 16, 0.22);
+}
+
+.featured-coffee .product-card__visual {
+  aspect-ratio: 4 / 4.3;
+  padding: 5% 7% 6%;
+}
+
+.featured-coffee .product-card__meta {
+  padding: 14px 16px 12px;
+}
+
+.featured-coffee .product-card__meta h3 {
+  margin: 6px 0 10px;
+}
+
+.featured-coffee .product-card__buy {
+  padding: 0 16px 12px;
+  gap: 10px;
 }
 
 .section-heading {
