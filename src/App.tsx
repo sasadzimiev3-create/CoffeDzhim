@@ -133,6 +133,69 @@ const partners = [
   { name: 'Barista Line', logo: '/assets/partners/barista-line.png', fit: 'wide' },
 ] as const
 
+const reviews = [
+  {
+    id: 'smena',
+    kind: 'Кофейня',
+    city: 'Санкт-Петербург',
+    quote:
+      'Зерно Ingresso держит один профиль от поставки к поставке. Бариста не перенастраивают помол каждую неделю, и эспрессо в карте не пляшет.',
+    name: 'Мария Соколова',
+    role: 'Управляющая, «Смена»',
+    initials: 'МС',
+  },
+  {
+    id: 'gavan',
+    kind: 'Ресторан',
+    city: 'Санкт-Петербург',
+    quote:
+      'Поставили Ottima на две группы и в тот же день настроили под наше зерно. Если группа капризничает, сервис приезжает на точку, а не записывает на следующую неделю.',
+    name: 'Алексей Крылов',
+    role: 'Шеф-бариста, «Тихая гавань»',
+    initials: 'АК',
+  },
+  {
+    id: 'kontur',
+    kind: 'Офис',
+    city: 'Санкт-Петербург',
+    quote:
+      'На сорок человек хватает одного суперавтомата и одной заявки: зерно, химия и фильтры приезжают вместе. Не ведём трёх поставщиков ради кофейной точки.',
+    name: 'Ирина Волкова',
+    role: 'Офис-менеджер, «Северный контур»',
+    initials: 'ИВ',
+  },
+  {
+    id: 'tretiy-stol',
+    kind: 'Кофейня',
+    city: 'Санкт-Петербург',
+    quote:
+      'Открывали точку с нуля. Машину, помол и ТТК на напитки собрали до запуска зала — в первую неделю не собирали карту на ходу.',
+    name: 'Дмитрий Панин',
+    role: 'Владелец, «Третий стол»',
+    initials: 'ДП',
+  },
+  {
+    id: 'dvorovye',
+    kind: 'Сеть',
+    city: 'Кудрово',
+    quote:
+      'Три точки, одна обжарка и одна цена. Накладные приходят сразу, а менеджер отвечает в Telegram, пока смена ещё не закрыта.',
+    name: 'Ольга Белова',
+    role: 'Закупки, «Дворовые»',
+    initials: 'ОБ',
+  },
+  {
+    id: 'polka',
+    kind: 'Пекарня',
+    city: 'Всеволожск',
+    quote:
+      'Раньше машину увозили в сервис на несколько дней. Сейчас диагностика и чистка проходят у нас, и бар стоит часы, а не всю смену.',
+    name: 'Сергей Минин',
+    role: 'Технический директор, «Тёплая полка»',
+    initials: 'СМ',
+  },
+] as const
+
 const promoSlides = [
   {
     id: 'futurmat',
@@ -365,6 +428,121 @@ function PromoSlider() {
         ))}
       </div>
     </div>
+  )
+}
+
+function ReviewsPanel() {
+  const [index, setIndex] = useState(0)
+  const touchX = useRef<number | null>(null)
+  const count = reviews.length
+  const review = reviews[index]
+
+  const goTo = (next: number) => {
+    setIndex(((next % count) + count) % count)
+  }
+
+  return (
+    <section className="reviews" id="reviews" aria-labelledby="reviews-title">
+      <div className="section-heading" data-reveal>
+        <div>
+          <p className="eyebrow">04 / Отзывы</p>
+          <h2 id="reviews-title">
+            Заведения о зерне,
+            <br />
+            технике и <em>сервисе</em>
+          </h2>
+        </div>
+        <p>
+          Кофейни, рестораны и офисы Петербурга — как проходит поставка и
+          обслуживание на точке.
+        </p>
+      </div>
+
+      <div
+        className="reviews__panel"
+        data-reveal
+        onTouchStart={(event) => {
+          touchX.current = event.touches[0].clientX
+        }}
+        onTouchEnd={(event) => {
+          if (touchX.current == null) return
+          const delta = event.changedTouches[0].clientX - touchX.current
+          if (Math.abs(delta) > 40) goTo(index + (delta < 0 ? 1 : -1))
+          touchX.current = null
+        }}
+      >
+        <div className="reviews__viewport">
+          <div
+            className="reviews__track"
+            style={{ transform: `translateX(-${index * 100}%)` }}
+          >
+            {reviews.map((item, slideIndex) => (
+              <article
+                className="reviews__slide"
+                key={item.id}
+                aria-hidden={slideIndex !== index}
+              >
+                <div className="reviews__copy">
+                  <p className="eyebrow">
+                    {item.kind} · {item.city}
+                  </p>
+                  <blockquote>
+                    <p>{item.quote}</p>
+                  </blockquote>
+                </div>
+                <footer className="reviews__person">
+                  <span className="reviews__num">0{slideIndex + 1}</span>
+                  <div className="reviews__identity">
+                    <span className="reviews__initials" aria-hidden="true">
+                      {item.initials}
+                    </span>
+                    <div>
+                      <strong>{item.name}</strong>
+                      <span>{item.role}</span>
+                    </div>
+                  </div>
+                </footer>
+              </article>
+            ))}
+          </div>
+        </div>
+
+        <div className="reviews__controls">
+          <button
+            className="reviews__arrow"
+            type="button"
+            onClick={() => goTo(index - 1)}
+            aria-label="Предыдущий отзыв"
+          >
+            <ChevronLeft size={20} />
+          </button>
+          <div className="reviews__dots" role="tablist" aria-label="Отзывы">
+            {reviews.map((item, slideIndex) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-label={`${item.name}, ${item.role}`}
+                aria-selected={slideIndex === index}
+                className={slideIndex === index ? 'is-active' : ''}
+                onClick={() => goTo(slideIndex)}
+              />
+            ))}
+          </div>
+          <button
+            className="reviews__arrow"
+            type="button"
+            onClick={() => goTo(index + 1)}
+            aria-label="Следующий отзыв"
+          >
+            <ChevronRight size={20} />
+          </button>
+        </div>
+        <p className="reviews__live" aria-live="polite">
+          {review.name}. {review.role}. {review.quote}
+        </p>
+      </div>
+    </section>
   )
 }
 
@@ -847,6 +1025,8 @@ function HomeView({
           ))}
         </ul>
       </section>
+
+      <ReviewsPanel />
 
       <section className="home-cta" data-reveal>
         <div>
