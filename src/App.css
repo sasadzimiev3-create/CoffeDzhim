@@ -574,6 +574,45 @@ main {
   padding: var(--section-pad) var(--page-pad);
 }
 
+.catalog-index {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.catalog-index__photo {
+  position: absolute;
+  z-index: 0;
+  inset: -20px;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(244, 238, 230, 0.34) 0%,
+      rgba(244, 238, 230, 0.1) 18%,
+      rgba(244, 238, 230, 0.06) 100%
+    ),
+    url('/assets/catalog-shelf.png') center 64% / cover no-repeat;
+  filter: blur(3px) saturate(1.05);
+  transform: scale(1.03);
+  pointer-events: none;
+}
+
+.catalog-index .section-heading,
+.catalog-index .category-nav {
+  position: relative;
+  z-index: 1;
+}
+
+.catalog-index .section-heading h2,
+.catalog-index .section-heading > p,
+.catalog-index .section-heading .eyebrow {
+  text-shadow: 0 0 16px rgba(244, 238, 230, 0.9);
+}
+
+.catalog-index .category-nav__item {
+  box-shadow: 0 14px 32px rgba(26, 20, 16, 0.08);
+}
+
 .section-heading {
   display: flex;
   margin-bottom: clamp(40px, 5vw, 72px);

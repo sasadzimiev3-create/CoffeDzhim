@@ -742,6 +742,7 @@ function HomeView({
       </section>
 
       <section className="catalog-index" id="home-catalog">
+        <div className="catalog-index__photo" aria-hidden="true" />
         <div className="section-heading" data-reveal>
           <div>
             <p className="eyebrow">01 / Каталог</p>
