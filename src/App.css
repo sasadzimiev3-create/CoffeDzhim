@@ -897,8 +897,10 @@ main {
 }
 
 .category-nav__mark {
-  width: 172px;
-  height: 172px;
+  width: min(172px, 86%);
+  height: auto;
+  max-height: 78%;
+  aspect-ratio: 1;
   filter: drop-shadow(0 16px 18px rgba(42, 28, 18, 0.14));
 }
 
