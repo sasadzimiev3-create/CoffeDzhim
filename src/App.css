@@ -310,7 +310,7 @@ main {
 }
 
 .promo-slide--coffee {
-  background: #170e0a;
+  background: #2a170c;
 }
 
 .promo-slide__copy {
@@ -487,25 +487,27 @@ main {
 
 .promo-slide--coffee .promo-slide__visual {
   position: absolute;
-  inset: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: auto;
   z-index: 0;
+  width: min(76%, 1180px);
   padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .promo-slide--coffee .promo-slide__visual img {
-  width: 100%;
+  width: auto;
   height: 100%;
-  max-width: none;
+  max-width: 100%;
   object-fit: contain;
-  object-position: center center;
+  object-position: right center;
   filter: none;
-}
-
-@media (min-width: 1580px) {
-  .promo-slide--coffee .promo-slide__visual img {
-    object-fit: cover;
-    object-position: right bottom;
-  }
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 16%);
+  mask-image: linear-gradient(90deg, transparent 0%, #000 16%);
 }
 
 .promo-slide--coffee .promo-slide__copy .button {
@@ -2601,6 +2603,8 @@ html:has(body.modal-open),
     position: relative;
     inset: auto;
     order: -1;
+    display: block;
+    width: auto;
   }
 
   .promo-slide--coffee .promo-slide__visual img {
@@ -2609,8 +2613,10 @@ html:has(body.modal-open),
     max-width: none;
     max-height: 100%;
     object-fit: cover;
-    object-position: 72% center;
+    object-position: right center;
     filter: none;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .promo-slide--coffee .promo-slide__copy {

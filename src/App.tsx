@@ -234,7 +234,7 @@ const promoSlides = [
     ],
     cta: 'Выбрать кофе',
     href: '#coffee',
-    image: '/assets/coffee-ingresso-offer.jpg',
+    image: '/assets/coffee-ingresso-offer.png',
     imageAlt: '10 кг кофе Ingresso и пачка дрип-пакетов',
   },
 ] as const
