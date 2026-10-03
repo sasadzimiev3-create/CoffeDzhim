@@ -230,12 +230,12 @@ const promoSlides = [
       'Бесплатная диагностика оборудования',
       'Настроим оборудование на новое зерно',
       'Сделаем ТТК',
-      'Бесплатно привезем по СПБ и ЛО',
+      'Бесплатно привезем по СПб и ЛО',
     ],
     cta: 'Выбрать кофе',
     href: '#coffee',
-    image: '/assets/coffee-ingresso-lineup-cutout.png',
-    imageAlt: 'Пачки кофе Ingresso',
+    image: '/assets/coffee-ingresso-offer.jpg',
+    imageAlt: '10 кг кофе Ingresso и пачка дрип-пакетов',
   },
 ] as const
 
@@ -938,7 +938,7 @@ function HomeView({
             <a
               key={category.id}
               href={`#${category.id}`}
-              className={`category-nav__item ${
+              className={`category-nav__item category-nav__item--${category.id} ${
                 category.logo ? 'category-nav__item--brand' : ''
               } ${category.available ? '' : 'category-nav__item--soon'}`}
             >
@@ -961,7 +961,7 @@ function HomeView({
                 {category.image ? (
                   <img src={category.image} alt="" />
                 ) : (
-                  <Leaf size={42} />
+                  <Leaf className="category-nav__mark" size={172} strokeWidth={1.25} />
                 )}
               </div>
             </a>
