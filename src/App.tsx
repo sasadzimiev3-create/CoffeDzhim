@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
   ArrowLeft,
@@ -331,11 +331,50 @@ function PromoSlider() {
     return () => window.clearInterval(timer)
   }, [paused, count])
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const slider = sliderRef.current
     if (!slider) return undefined
 
+    const alignPhoto = () => {
+      const mobile = window.matchMedia('(max-width: 860px)').matches
+      const machineSlide = slider.querySelector<HTMLElement>('.promo-slide--machine')
+      const coffeeSlide = slider.querySelector<HTMLElement>('.promo-slide--coffee')
+      const machineImg = machineSlide?.querySelector<HTMLImageElement>('img')
+      const coffeeImg = coffeeSlide?.querySelector<HTMLImageElement>('img')
+      if (!machineSlide || !coffeeSlide || !machineImg || !coffeeImg) return
+      if (machineImg.getBoundingClientRect().height < 20) return
+
+      if (mobile) {
+        if (coffeeImg.style.marginTop || coffeeImg.style.maxHeight) {
+          coffeeImg.style.marginTop = ''
+          coffeeImg.style.maxHeight = ''
+        }
+        const machineBottom =
+          machineImg.getBoundingClientRect().bottom - machineSlide.getBoundingClientRect().top
+        const coffeeTop =
+          coffeeImg.getBoundingClientRect().top - coffeeSlide.getBoundingClientRect().top
+        const next = `${Math.max(160, Math.round(machineBottom - coffeeTop))}px`
+        if (coffeeImg.style.height !== next) coffeeImg.style.height = next
+        return
+      }
+
+      if (coffeeImg.style.height) coffeeImg.style.height = ''
+      const currentShift = Number.parseFloat(coffeeImg.style.marginTop) || 0
+      const machineTop =
+        machineImg.getBoundingClientRect().top - machineSlide.getBoundingClientRect().top
+      const coffeeTop =
+        coffeeImg.getBoundingClientRect().top -
+        coffeeSlide.getBoundingClientRect().top -
+        currentShift
+      const shift = Math.max(0, Math.round(machineTop - coffeeTop))
+      const nextMargin = shift ? `${shift}px` : ''
+      const nextMax = shift ? `calc(100% - ${shift}px)` : ''
+      if (coffeeImg.style.marginTop !== nextMargin) coffeeImg.style.marginTop = nextMargin
+      if (coffeeImg.style.maxHeight !== nextMax) coffeeImg.style.maxHeight = nextMax
+    }
+
     const fit = () => {
+      alignPhoto()
       const mobile = window.matchMedia('(max-width: 860px)').matches
       const slide = slider.querySelectorAll<HTMLElement>('.promo-slide')[index]
       if (!mobile || !slide) {
@@ -349,9 +388,14 @@ function PromoSlider() {
     fit()
     const observer = new ResizeObserver(fit)
     slider.querySelectorAll('.promo-slide').forEach((slide) => observer.observe(slide))
+    const images = slider.querySelectorAll('img')
+    images.forEach((img) => {
+      if (!img.complete) img.addEventListener('load', fit)
+    })
     window.addEventListener('resize', fit)
     return () => {
       observer.disconnect()
+      images.forEach((img) => img.removeEventListener('load', fit))
       window.removeEventListener('resize', fit)
       slider.style.height = ''
     }
