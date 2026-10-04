@@ -314,6 +314,7 @@ function PromoSlider() {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const touchX = useRef<number | null>(null)
+  const sliderRef = useRef<HTMLDivElement>(null)
   const count = promoSlides.length
 
   const goTo = (next: number) => {
@@ -330,8 +331,35 @@ function PromoSlider() {
     return () => window.clearInterval(timer)
   }, [paused, count])
 
+  useEffect(() => {
+    const slider = sliderRef.current
+    if (!slider) return undefined
+
+    const fit = () => {
+      const mobile = window.matchMedia('(max-width: 860px)').matches
+      const slide = slider.querySelectorAll<HTMLElement>('.promo-slide')[index]
+      if (!mobile || !slide) {
+        slider.style.height = ''
+        return
+      }
+      const next = `${slide.offsetHeight}px`
+      if (slider.style.height !== next) slider.style.height = next
+    }
+
+    fit()
+    const observer = new ResizeObserver(fit)
+    slider.querySelectorAll('.promo-slide').forEach((slide) => observer.observe(slide))
+    window.addEventListener('resize', fit)
+    return () => {
+      observer.disconnect()
+      window.removeEventListener('resize', fit)
+      slider.style.height = ''
+    }
+  }, [index])
+
   return (
     <div
+      ref={sliderRef}
       className="promo-slider"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

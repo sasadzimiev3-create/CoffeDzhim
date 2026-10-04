@@ -2585,6 +2585,11 @@ html:has(body.modal-open),
     height: auto;
     min-height: 0;
     max-height: none;
+    transition: height 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .promo-slider__track {
+    align-items: flex-start;
   }
 
   .promo-slide,
@@ -2596,6 +2601,12 @@ html:has(body.modal-open),
     grid-template-rows: auto auto;
     align-content: start;
     gap: 12px;
+  }
+
+  .promo-slide--coffee {
+    align-self: flex-start;
+    min-height: 0;
+    padding-top: 0;
   }
 
   .promo-slide__visual {
@@ -2634,17 +2645,18 @@ html:has(body.modal-open),
 
   .promo-slide--coffee .promo-slide__visual img {
     flex: 0 1 auto;
-    width: auto;
+    width: 100%;
     height: auto;
     min-width: 0;
     min-height: 0;
     max-width: 100%;
-    max-height: min(52vh, 460px);
-    object-fit: contain;
-    object-position: center center;
+    max-height: none;
+    aspect-ratio: 1088 / 575;
+    object-fit: cover;
+    object-position: center top;
     filter: none;
-    -webkit-mask-image: none;
-    mask-image: none;
+    -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 78%, transparent 100%);
   }
 
   .promo-slide--coffee .promo-slide__copy {
@@ -2730,6 +2742,12 @@ html:has(body.modal-open),
   }
 }
 
+@media (max-width: 860px) and (prefers-reduced-motion: reduce) {
+  .promo-slider {
+    transition: none;
+  }
+}
+
 @media (max-width: 640px) {
   :root {
     --header-h: 68px;
@@ -2741,9 +2759,13 @@ html:has(body.modal-open),
     height: 36px;
   }
 
-  .promo-slide,
-  .promo-slide--coffee {
+  .promo-slide {
     min-height: calc(100svh - var(--header-h));
+    padding-bottom: 88px;
+  }
+
+  .promo-slide--coffee {
+    min-height: 0;
     padding-bottom: 88px;
   }
 
@@ -2832,6 +2854,24 @@ html:has(body.modal-open),
 
   .accessories-teaser p {
     display: none;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 740px) {
+  .promo-slide--coffee .promo-slide__visual img {
+    aspect-ratio: 1088 / 480;
+  }
+
+  .promo-slide--coffee .promo-slide__offer {
+    margin-top: 8px;
+  }
+
+  .promo-slide--coffee .promo-slide__copy .button {
+    margin-top: 14px;
+  }
+
+  .promo-slide--coffee {
+    padding-bottom: 78px;
   }
 }
 
