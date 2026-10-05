@@ -1140,30 +1140,49 @@ main {
 
 .partners {
   display: grid;
-  padding: var(--section-pad) var(--page-pad);
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: start;
-  gap: clamp(40px, 5vw, 88px);
+  padding: clamp(28px, 2.8vw, 52px) var(--page-pad) var(--section-pad);
+  grid-template-columns: minmax(260px, 0.78fr) minmax(0, 1.22fr);
+  grid-template-rows: auto auto;
+  align-items: stretch;
+  column-gap: 0;
   background: var(--paper);
 }
 
-.partners__brands h2,
-.partners__journey h2 {
-  margin: 0;
+.partners__brands,
+.partners__journey {
+  display: grid;
+  grid-row: 1 / span 2;
+  grid-template-rows: subgrid;
+  align-content: start;
+  min-width: 0;
+}
+
+.partners__brands {
+  grid-column: 1;
+  padding-right: clamp(22px, 2.4vw, 40px);
+}
+
+.partners__journey {
+  grid-column: 2;
+  padding-left: clamp(22px, 2.6vw, 44px);
+  border-left: 1px solid var(--line-strong);
+}
+
+.partners__head {
+  align-self: start;
+  padding-bottom: clamp(18px, 2vw, 28px);
+}
+
+.partners__head h2 {
+  margin: 8px 0 0;
   font-family: var(--font-sans);
+  font-size: clamp(40px, 3.8vw, 62px);
   font-weight: 600;
-  letter-spacing: -0.045em;
-}
-
-.partners__brands h2,
-.partners__journey h2 {
-  margin-top: 14px;
-  font-size: clamp(44px, 4.2vw, 68px);
   line-height: 0.94;
+  letter-spacing: -0.046em;
 }
 
-.partners__brands h2 em,
-.partners__journey h2 em {
+.partners__head h2 em {
   font-family: var(--font-serif);
   font-weight: 400;
   font-style: italic;
@@ -1173,7 +1192,8 @@ main {
 
 .partners__list {
   display: grid;
-  margin: clamp(28px, 3vw, 40px) 0 0;
+  align-self: start;
+  margin: 0;
   padding: 0;
   list-style: none;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1183,51 +1203,65 @@ main {
 
 .partners__list li {
   display: grid;
-  min-height: 112px;
+  min-height: 132px;
   place-items: center;
-  padding: 18px 12px;
+  padding: 22px 16px;
   border-right: 1px solid var(--line-strong);
   border-bottom: 1px solid var(--line-strong);
+  background: transparent;
+  transition: background-color 220ms ease;
+}
+
+.partners__list li:hover {
+  background: rgba(250, 246, 240, 0.72);
 }
 
 .partners__logo {
   width: auto;
   height: auto;
   max-width: 78%;
-  max-height: 52px;
+  max-height: 58px;
   object-fit: contain;
 }
 
 .partners__logo--word {
   max-width: 88%;
-  max-height: 22px;
+  max-height: 26px;
 }
 
 .partners__logo--wide {
-  max-width: 80%;
-  max-height: 46px;
+  max-width: 82%;
+  max-height: 52px;
 }
 
 .path {
   display: grid;
-  margin: clamp(28px, 3vw, 36px) 0 0;
+  align-self: start;
+  grid-template-columns:
+    minmax(0, 1fr)
+    clamp(72px, 6.2vw, 112px)
+    minmax(0, 1fr)
+    clamp(72px, 6.2vw, 112px)
+    minmax(0, 1fr);
+  grid-template-areas:
+    'plant to-ship ship to-cup cup'
+    'cap1 . cap2 . cap3';
+  min-width: 0;
+}
+
+.path ol {
+  display: contents;
+  margin: 0;
   padding: 0;
   list-style: none;
-  grid-template-columns: 1.15fr 1.15fr 0.95fr 1.15fr 1.15fr 0.95fr;
-  grid-template-areas:
-    'roast roast cap1 ship ship cap2'
-    '. cup cup cap3 cap3 .';
-  column-gap: 14px;
-  row-gap: 22px;
-  align-items: start;
 }
 
 .path__step {
   display: contents;
 }
 
-.path__step--roast .path__photo { grid-area: roast; }
-.path__step--roast .path__copy { grid-area: cap1; padding-left: 12px; }
+.path__step--plant .path__photo { grid-area: plant; }
+.path__step--plant .path__copy { grid-area: cap1; }
 .path__step--ship .path__photo { grid-area: ship; }
 .path__step--ship .path__copy { grid-area: cap2; }
 .path__step--cup .path__photo { grid-area: cup; }
@@ -1236,76 +1270,102 @@ main {
 .path__photo {
   position: relative;
   margin: 0;
-  aspect-ratio: 16 / 10;
-  border-radius: 14px;
-  background: var(--paper-3);
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  border-radius: 16px;
+  background: var(--ink);
+  box-shadow: 0 18px 40px rgba(26, 20, 16, 0.12);
 }
 
 .path__photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: inherit;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.path__photo--roast img {
-  object-position: center 48%;
+.path__step:hover img {
+  transform: scale(1.045);
+}
+
+.path__photo--plant img {
+  object-position: center 46%;
 }
 
 .path__photo--ship img {
-  object-position: center 30%;
+  object-position: center 34%;
 }
 
 .path__photo--cup img {
-  object-position: center 42%;
+  object-position: center 36%;
 }
 
-.path__arrow {
-  position: absolute;
-  z-index: 1;
-  display: grid;
-  width: 26px;
-  height: 26px;
-  place-items: center;
-  border-radius: 50%;
-  background: var(--copper);
-  color: var(--paper);
-}
-
-.path__arrow--next {
-  top: 50%;
-  right: -13px;
-  transform: translateY(-50%);
-}
-
-.path__arrow--down {
-  bottom: -13px;
-  left: 0;
-  transform: translateX(-50%);
-}
-
-.path__num {
-  display: block;
-  color: var(--copper);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+.path__copy {
+  padding: 14px 2px 0 0;
 }
 
 .path__copy h3 {
-  margin: 4px 0 6px;
-  font-size: 13px;
-  font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.path__num {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--copper);
 }
 
 .path__copy p {
-  margin: 0;
+  margin: 6px 0 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 13.5px;
   line-height: 1.4;
+}
+
+.path__bridge {
+  position: relative;
+  z-index: 1;
+  align-self: stretch;
+}
+
+.path__bridge--to-ship { grid-area: to-ship; }
+.path__bridge--to-cup { grid-area: to-cup; }
+
+.path__bridge::before,
+.path__bridge::after {
+  position: absolute;
+  content: '';
+}
+
+.path__bridge--to-ship::before,
+.path__bridge--to-cup::before {
+  top: 50%;
+  right: 14px;
+  left: -12px;
+  height: 2px;
+  background: var(--copper);
+  transform: translateY(-50%);
+}
+
+.path__bridge--to-ship::after,
+.path__bridge--to-cup::after {
+  top: 50%;
+  right: -2px;
+  width: 11px;
+  height: 11px;
+  margin-top: -6px;
+  border-top: 2px solid var(--copper);
+  border-right: 2px solid var(--copper);
+  transform: rotate(45deg);
 }
 
 /* ---------- Reviews ---------- */
@@ -2707,15 +2767,79 @@ html:has(body.modal-open),
   }
 }
 
-@media (max-width: 860px) {
+@media (max-width: 1180px) {
   .partners {
     grid-template-columns: 1fr;
-    gap: 48px;
+    grid-template-rows: auto;
+    row-gap: 48px;
   }
 
-  .partners__brands h2,
-  .partners__journey h2 {
+  .partners__brands,
+  .partners__journey {
+    display: flex;
+    flex-direction: column;
+    grid-column: 1;
+    grid-row: auto;
+    padding: 0;
+    border: 0;
+  }
+
+  .partners__head h2 {
     max-width: 10em;
+  }
+
+  .partners__journey {
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 900px) {
+  .path {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'plant'
+      'cap1'
+      'to-ship'
+      'ship'
+      'cap2'
+      'to-cup'
+      'cup'
+      'cap3';
+    width: min(100%, 460px);
+    margin-inline: auto;
+  }
+
+  .path__photo {
+    aspect-ratio: 3 / 4;
+  }
+
+  .path__bridge {
+    height: 64px;
+  }
+
+  .path__bridge--to-ship::before,
+  .path__bridge--to-cup::before {
+    top: -8px;
+    right: auto;
+    bottom: 16px;
+    left: 50%;
+    width: 2px;
+    height: auto;
+    background: var(--copper);
+    transform: translateX(-50%);
+  }
+
+  .path__bridge--to-ship::after,
+  .path__bridge--to-cup::after {
+    top: auto;
+    right: auto;
+    bottom: 0;
+    left: 50%;
+    margin: 0 0 0 -7px;
+    border: 0;
+    border-right: 2px solid var(--copper);
+    border-bottom: 2px solid var(--copper);
+    transform: rotate(45deg);
   }
 }
 
@@ -2962,18 +3086,8 @@ html:has(body.modal-open),
     display: none;
   }
 
-  .path {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
-    grid-template-areas:
-      'roast cap1'
-      'ship cap2'
-      'cup cap3';
-    row-gap: 16px;
-  }
-
-  .path__arrow--next,
-  .path__arrow--down {
-    display: none;
+  .partners__list li {
+    min-height: 104px;
   }
 
   .site-footer {

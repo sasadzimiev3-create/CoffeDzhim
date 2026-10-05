@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
-  ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
@@ -136,28 +135,28 @@ const partners = [
 
 const coffeePath = [
   {
-    id: 'roast',
+    id: 'plant',
     num: '01',
-    title: 'Обжарка',
-    text: 'Зелёное зерно превращается в кофе с характером.',
-    image: '/assets/journey/roast.jpg',
-    alt: 'Ростер, на котором обжариваем кофе',
+    title: 'Завод',
+    text: 'Ростер Loring. Профиль партии задаётся на заводе.',
+    image: '/assets/journey/plant.jpg',
+    alt: 'Ростер Loring на обжарочном производстве',
   },
   {
     id: 'ship',
     num: '02',
     title: 'Доставка',
-    text: 'Готовый кофе уезжает на точку.',
+    text: 'Кофе уезжает на точку в той же обжарке.',
     image: '/assets/journey/ship.jpg',
     alt: 'Упаковки Ingresso на палете перед контейнером',
   },
   {
     id: 'cup',
     num: '03',
-    title: 'Эспрессо',
-    text: 'И наконец — кофе оказывается в чашке.',
+    title: 'Чашка',
+    text: 'На баре зерно становится эспрессо.',
     image: '/assets/journey/cup.jpg',
-    alt: 'Эспрессо в чашках Ingresso',
+    alt: 'Эспрессо в чашках Ingresso на кофемашине',
   },
 ] as const
 
@@ -1090,14 +1089,16 @@ function HomeView({
 
       <section className="partners" id="partners">
         <div className="partners__brands" data-reveal>
-          <p className="eyebrow">03 / Партнёры</p>
-          <h2>
-            Бренды,
-            <br />
-            с которыми
-            <br />
-            <em>работаем</em>
-          </h2>
+          <div className="partners__head">
+            <p className="eyebrow">03 / Партнёры</p>
+            <h2>
+              Бренды,
+              <br />
+              с которыми
+              <br />
+              <em>работаем</em>
+            </h2>
+          </div>
           <ul className="partners__list">
             {partners.map((partner) => (
               <li key={partner.name}>
@@ -1112,38 +1113,34 @@ function HomeView({
         </div>
 
         <div className="partners__journey" data-reveal>
-          <div className="partners__journey-head">
-            <p className="eyebrow">От обжарки до чашки</p>
+          <div className="partners__head">
+            <p className="eyebrow">Путь зерна</p>
             <h2>
-              Путь, который
+              От обжарки
               <br />
-              проходит <em>кофе</em>
+              до <em>чашки</em>
             </h2>
           </div>
-          <ol className="path">
-            {coffeePath.map((step, index) => (
-              <li key={step.id} className={`path__step path__step--${step.id}`}>
-                <figure className={`path__photo path__photo--${step.id}`}>
-                  <img src={step.image} alt={step.alt} />
-                  {index === 0 ? (
-                    <span className="path__arrow path__arrow--next" aria-hidden="true">
-                      <ArrowRight size={14} strokeWidth={2} />
-                    </span>
-                  ) : null}
-                  {index === 1 ? (
-                    <span className="path__arrow path__arrow--down" aria-hidden="true">
-                      <ArrowDown size={14} strokeWidth={2} />
-                    </span>
-                  ) : null}
-                </figure>
-                <div className="path__copy">
-                  <span className="path__num">{step.num}</span>
-                  <h3>{step.title}</h3>
-                  <p>{step.text}</p>
-                </div>
-              </li>
-            ))}
-          </ol>
+          <div className="path">
+            <ol>
+              {coffeePath.map((step) => (
+                <li key={step.id} className={`path__step path__step--${step.id}`}>
+                  <figure className={`path__photo path__photo--${step.id}`}>
+                    <img src={step.image} alt={step.alt} />
+                  </figure>
+                  <div className="path__copy">
+                    <h3>
+                      <span className="path__num">{step.num}</span>
+                      {step.title}
+                    </h3>
+                    <p>{step.text}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+            <span className="path__bridge path__bridge--to-ship" aria-hidden="true" />
+            <span className="path__bridge path__bridge--to-cup" aria-hidden="true" />
+          </div>
         </div>
       </section>
 
