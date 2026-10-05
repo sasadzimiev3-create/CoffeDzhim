@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
+  ArrowDown,
   ArrowLeft,
   ArrowRight,
   ArrowUpRight,
@@ -135,44 +136,28 @@ const partners = [
 
 const coffeePath = [
   {
-    id: 'harvest',
-    num: '01',
-    title: 'Урожай',
-    text: 'Кофейная ягода начинает свой путь здесь.',
-    image: '/assets/journey/harvest.jpg',
-    alt: 'Сбор спелой кофейной ягоды',
-  },
-  {
-    id: 'dry',
-    num: '02',
-    title: 'Сушка и обработка',
-    text: 'После сбора кофе проходит обработку и сушится.',
-    image: '/assets/journey/dry.jpg',
-    alt: 'Сушка кофейного зерна на патио',
-  },
-  {
     id: 'roast',
-    num: '03',
+    num: '01',
     title: 'Обжарка',
     text: 'Зелёное зерно превращается в кофе с характером.',
     image: '/assets/journey/roast.jpg',
-    alt: 'Зерно остывает после обжарки',
+    alt: 'Ростер, на котором обжариваем кофе',
   },
   {
     id: 'ship',
-    num: '04',
+    num: '02',
     title: 'Доставка',
-    text: 'Готовый кофе отправляется к нам.',
-    image: '/assets/coffee-ingresso-offer.jpg',
-    alt: 'Упаковки кофе Ingresso',
+    text: 'Готовый кофе уезжает на точку.',
+    image: '/assets/journey/ship.jpg',
+    alt: 'Упаковки Ingresso на палете перед контейнером',
   },
   {
     id: 'cup',
-    num: '05',
+    num: '03',
     title: 'Эспрессо',
     text: 'И наконец — кофе оказывается в чашке.',
     image: '/assets/journey/cup.jpg',
-    alt: 'Два эспрессо под группой кофемашины',
+    alt: 'Эспрессо в чашках Ingresso',
   },
 ] as const
 
@@ -1128,23 +1113,28 @@ function HomeView({
 
         <div className="partners__journey" data-reveal>
           <div className="partners__journey-head">
-            <h2>Путь, который проходит кофе</h2>
-            <p>
-              От кофейной ягоды до чашки — показываем путь, который проходит
-              кофе.
-            </p>
+            <p className="eyebrow">От обжарки до чашки</p>
+            <h2>
+              Путь, который
+              <br />
+              проходит <em>кофе</em>
+            </h2>
           </div>
-          <ol className="journey">
-            {coffeePath.map((step) => (
-              <li
-                key={step.id}
-                className={`journey__step journey__step--${step.id}`}
-              >
-                <figure className="journey__photo">
-                  <img src={step.image} alt={step.alt} />
-                </figure>
-                <div className="journey__copy">
-                  <span className="journey__num">{step.num}</span>
+          <ol className="path">
+            {coffeePath.map((step, index) => (
+              <li key={step.id} className="path__step">
+                <div className="path__visual">
+                  <figure className={`path__photo path__photo--${step.id}`}>
+                    <img src={step.image} alt={step.alt} />
+                  </figure>
+                  {index < coffeePath.length - 1 ? (
+                    <div className="path__arrow" aria-hidden="true">
+                      <ArrowDown size={16} strokeWidth={1.75} />
+                    </div>
+                  ) : null}
+                </div>
+                <div className="path__copy">
+                  <span className="path__num">{step.num}</span>
                   <h3>{step.title}</h3>
                   <p>{step.text}</p>
                 </div>
