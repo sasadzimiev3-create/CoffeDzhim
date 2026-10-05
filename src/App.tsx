@@ -359,18 +359,8 @@ function PromoSlider() {
       }
 
       if (coffeeImg.style.height) coffeeImg.style.height = ''
-      const currentShift = Number.parseFloat(coffeeImg.style.marginTop) || 0
-      const machineTop =
-        machineImg.getBoundingClientRect().top - machineSlide.getBoundingClientRect().top
-      const coffeeTop =
-        coffeeImg.getBoundingClientRect().top -
-        coffeeSlide.getBoundingClientRect().top -
-        currentShift
-      const shift = Math.max(0, Math.round(machineTop - coffeeTop))
-      const nextMargin = shift ? `${shift}px` : ''
-      const nextMax = shift ? `calc(100% - ${shift}px)` : ''
-      if (coffeeImg.style.marginTop !== nextMargin) coffeeImg.style.marginTop = nextMargin
-      if (coffeeImg.style.maxHeight !== nextMax) coffeeImg.style.maxHeight = nextMax
+      if (coffeeImg.style.marginTop) coffeeImg.style.marginTop = ''
+      if (coffeeImg.style.maxHeight) coffeeImg.style.maxHeight = ''
     }
 
     const fit = () => {
