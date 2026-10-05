@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { CSSProperties, FormEvent, ReactNode } from 'react'
 import {
   ArrowLeft,
@@ -341,7 +341,6 @@ function PromoSlider() {
   const [index, setIndex] = useState(0)
   const [paused, setPaused] = useState(false)
   const touchX = useRef<number | null>(null)
-  const sliderRef = useRef<HTMLDivElement>(null)
   const count = promoSlides.length
 
   const goTo = (next: number) => {
@@ -358,69 +357,8 @@ function PromoSlider() {
     return () => window.clearInterval(timer)
   }, [paused, count])
 
-  useLayoutEffect(() => {
-    const slider = sliderRef.current
-    if (!slider) return undefined
-
-    const alignPhoto = () => {
-      const mobile = window.matchMedia('(max-width: 860px)').matches
-      const machineSlide = slider.querySelector<HTMLElement>('.promo-slide--machine')
-      const coffeeSlide = slider.querySelector<HTMLElement>('.promo-slide--coffee')
-      const machineImg = machineSlide?.querySelector<HTMLImageElement>('img')
-      const coffeeImg = coffeeSlide?.querySelector<HTMLImageElement>('img')
-      if (!machineSlide || !coffeeSlide || !machineImg || !coffeeImg) return
-      if (machineImg.getBoundingClientRect().height < 20) return
-
-      if (mobile) {
-        if (coffeeImg.style.marginTop || coffeeImg.style.maxHeight) {
-          coffeeImg.style.marginTop = ''
-          coffeeImg.style.maxHeight = ''
-        }
-        const machineBottom =
-          machineImg.getBoundingClientRect().bottom - machineSlide.getBoundingClientRect().top
-        const coffeeTop =
-          coffeeImg.getBoundingClientRect().top - coffeeSlide.getBoundingClientRect().top
-        const next = `${Math.max(160, Math.round(machineBottom - coffeeTop))}px`
-        if (coffeeImg.style.height !== next) coffeeImg.style.height = next
-        return
-      }
-
-      if (coffeeImg.style.height) coffeeImg.style.height = ''
-      if (coffeeImg.style.marginTop) coffeeImg.style.marginTop = ''
-      if (coffeeImg.style.maxHeight) coffeeImg.style.maxHeight = ''
-    }
-
-    const fit = () => {
-      alignPhoto()
-      const mobile = window.matchMedia('(max-width: 860px)').matches
-      const slide = slider.querySelectorAll<HTMLElement>('.promo-slide')[index]
-      if (!mobile || !slide) {
-        slider.style.height = ''
-        return
-      }
-      const next = `${slide.offsetHeight}px`
-      if (slider.style.height !== next) slider.style.height = next
-    }
-
-    fit()
-    const observer = new ResizeObserver(fit)
-    slider.querySelectorAll('.promo-slide').forEach((slide) => observer.observe(slide))
-    const images = slider.querySelectorAll('img')
-    images.forEach((img) => {
-      if (!img.complete) img.addEventListener('load', fit)
-    })
-    window.addEventListener('resize', fit)
-    return () => {
-      observer.disconnect()
-      images.forEach((img) => img.removeEventListener('load', fit))
-      window.removeEventListener('resize', fit)
-      slider.style.height = ''
-    }
-  }, [index])
-
   return (
     <div
-      ref={sliderRef}
       className="promo-slider"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}

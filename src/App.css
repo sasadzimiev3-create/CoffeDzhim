@@ -112,6 +112,9 @@ main {
 .menu-toggle {
   display: none;
   justify-self: end;
+  width: 44px;
+  height: 44px;
+  place-items: center;
   color: inherit;
 }
 
@@ -120,7 +123,8 @@ main {
   z-index: 45;
   inset: 0;
   display: none;
-  padding: 110px var(--page-pad) 40px;
+  padding: calc(var(--header-h) + 28px) var(--page-pad) calc(32px + env(safe-area-inset-bottom));
+  overflow-y: auto;
   background: var(--paper);
   color: var(--ink);
   opacity: 0;
@@ -2822,98 +2826,143 @@ html:has(body.modal-open),
 
 @media (max-width: 860px) {
   .promo-slider {
-    height: auto;
+    height: calc(100svh - var(--header-h));
     min-height: 0;
     max-height: none;
-    transition: height 760ms cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
   }
 
   .promo-slider__track {
-    align-items: flex-start;
+    align-items: stretch;
+    height: 100%;
   }
 
   .promo-slide,
   .promo-slide--coffee {
-    height: auto;
-    min-height: calc(100svh - var(--header-h));
-    padding: 16px var(--page-pad) 96px;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto;
-    align-content: start;
-    gap: 12px;
-  }
-
-  .promo-slide--coffee {
-    align-self: flex-start;
+    height: 100%;
     min-height: 0;
-    padding-top: 0;
+    align-self: stretch;
+    padding: 0 var(--page-pad) calc(76px + env(safe-area-inset-bottom));
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: clamp(148px, 30svh, 240px) minmax(0, 1fr);
+    align-content: stretch;
+    gap: 12px;
+    overflow: hidden;
   }
 
-  .promo-slide__visual {
+  .promo-slide__visual,
+  .promo-slide--coffee .promo-slide__visual {
+    position: relative;
+    inset: auto;
     order: -1;
+    display: flex;
     align-self: stretch;
-    height: min(34vh, 280px);
-    min-height: 180px;
-    padding: 4px 0 0;
+    align-items: flex-end;
+    justify-content: center;
+    width: calc(100% + (var(--page-pad) * 2));
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    margin: 0 calc(var(--page-pad) * -1);
+    padding: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .promo-slide--machine .promo-slide__visual {
+    padding: 10px 12px 0;
   }
 
   .promo-slide__visual img,
-  .promo-slide--machine .promo-slide__visual img {
-    width: auto;
-    height: auto;
+  .promo-slide--machine .promo-slide__visual img,
+  .promo-slide--coffee .promo-slide__visual img {
+    position: relative;
+    inset: auto;
+    flex: none;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
     max-width: 100%;
     max-height: 100%;
+    margin: 0;
     object-fit: contain;
-    object-position: center;
+    object-position: center bottom;
+    filter: drop-shadow(0 18px 24px rgba(0, 0, 0, 0.35));
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .promo-slide--coffee::after {
     display: none;
   }
 
-  .promo-slide--coffee .promo-slide__visual {
-    position: relative;
-    inset: auto;
-    order: -1;
-    display: flex;
-    width: calc(100% + (var(--page-pad) * 2));
-    height: auto;
-    min-height: 0;
-    max-height: none;
-    margin-right: calc(var(--page-pad) * -1);
-    margin-left: calc(var(--page-pad) * -1);
-    padding: 0;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    pointer-events: auto;
-  }
-
   .promo-slide--coffee .promo-slide__visual img {
-    position: relative;
-    inset: auto;
-    flex: 0 1 auto;
-    width: 100%;
-    height: min(34vh, 280px);
-    min-width: 0;
-    min-height: 0;
-    max-width: 100%;
-    max-height: none;
     object-fit: cover;
-    object-position: center 42%;
+    object-position: center 38%;
     filter: none;
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
-    -webkit-mask-composite: source-over;
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent 100%);
-    mask-composite: add;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent 100%);
   }
 
+  .promo-slide__copy,
   .promo-slide--coffee .promo-slide__copy {
+    align-self: stretch;
     max-width: none;
+    min-height: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
   }
 
-  .promo-slide__copy h2 {
-    font-size: clamp(36px, 10vw, 52px);
+  .promo-slide__copy .eyebrow,
+  .promo-slide--coffee .promo-slide__copy .eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .promo-slide__copy h2,
+  .promo-slide--machine .promo-slide__copy h2 {
+    font-size: clamp(28px, 7.4vw, 36px);
+    line-height: 1.05;
+  }
+
+  .promo-slide--coffee .promo-slide__copy h2 {
+    font-size: clamp(32px, 8.6vw, 44px);
+  }
+
+  .promo-slide__price,
+  .promo-slide--coffee .promo-slide__price {
+    margin-top: 8px;
+    font-size: clamp(22px, 6vw, 30px);
+    white-space: normal;
+  }
+
+  .promo-slide--coffee .promo-slide__price--old {
+    margin-top: 8px;
+    font-size: 18px;
+  }
+
+  .promo-slide__price-extra {
+    white-space: normal;
+  }
+
+  .promo-slide__copy > p,
+  .promo-slide--machine .promo-slide__copy > p {
+    margin-top: 8px;
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+
+  .promo-slide__offer,
+  .promo-slide--machine .promo-slide__offer {
+    margin-top: 10px;
+    font-size: 13px;
+  }
+
+  .promo-slide__copy .button,
+  .promo-slide--machine .promo-slide__copy .button,
+  .promo-slide--coffee .promo-slide__copy .button {
+    margin-top: 14px;
+    min-height: 44px;
   }
 
   .promo-slider__arrow--prev {
@@ -2967,7 +3016,16 @@ html:has(body.modal-open),
   }
 
   .service-image {
-    min-height: 420px;
+    min-height: 260px;
+  }
+
+  .product-modal__visual {
+    min-height: 220px;
+  }
+
+  .social-links__item {
+    width: 44px;
+    height: 44px;
   }
 
   .product-modal {
@@ -2976,10 +3034,6 @@ html:has(body.modal-open),
     max-height: calc(100svh - 24px);
     overflow-y: auto;
     overscroll-behavior: contain;
-  }
-
-  .product-modal__visual {
-    min-height: 360px;
   }
 
   .accessories-teaser {
@@ -3008,18 +3062,13 @@ html:has(body.modal-open),
     height: 36px;
   }
 
-  .promo-slide {
-    min-height: calc(100svh - var(--header-h));
-    padding-bottom: 88px;
-  }
-
+  .promo-slide,
   .promo-slide--coffee {
     min-height: 0;
-    padding-bottom: 88px;
   }
 
   .promo-slide__copy > p {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .product-grid,
@@ -3203,16 +3252,45 @@ html:has(body.modal-open),
 }
 
 @media (max-width: 860px) and (max-height: 740px) {
-  .promo-slide--coffee .promo-slide__offer {
+  .promo-slide,
+  .promo-slide--coffee {
+    grid-template-rows: 116px minmax(0, 1fr);
+    gap: 8px;
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+
+  .promo-slide--machine .promo-slide__copy > p {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .promo-slide__offer,
+  .promo-slide--machine .promo-slide__offer {
     margin-top: 8px;
   }
 
+  .promo-slide__copy .button,
+  .promo-slide--machine .promo-slide__copy .button,
   .promo-slide--coffee .promo-slide__copy .button {
-    margin-top: 14px;
+    margin-top: 10px;
+  }
+}
+
+@media (max-width: 860px) and (max-height: 620px) {
+  .promo-slide,
+  .promo-slide--coffee {
+    grid-template-rows: 100px minmax(0, 1fr);
+    padding-bottom: calc(60px + env(safe-area-inset-bottom));
   }
 
-  .promo-slide--coffee {
-    padding-bottom: 78px;
+  .promo-slide--machine .promo-slide__copy h2 {
+    font-size: 24px;
+  }
+
+  .promo-slide--machine .promo-slide__copy > p {
+    display: none;
   }
 }
 
