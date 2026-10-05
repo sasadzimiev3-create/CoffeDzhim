@@ -1122,17 +1122,20 @@ function HomeView({
           </div>
           <ol className="path">
             {coffeePath.map((step, index) => (
-              <li key={step.id} className="path__step">
-                <div className="path__visual">
-                  <figure className={`path__photo path__photo--${step.id}`}>
-                    <img src={step.image} alt={step.alt} />
-                  </figure>
-                  {index < coffeePath.length - 1 ? (
-                    <div className="path__arrow" aria-hidden="true">
-                      <ArrowDown size={16} strokeWidth={1.75} />
-                    </div>
+              <li key={step.id} className={`path__step path__step--${step.id}`}>
+                <figure className={`path__photo path__photo--${step.id}`}>
+                  <img src={step.image} alt={step.alt} />
+                  {index === 0 ? (
+                    <span className="path__arrow path__arrow--next" aria-hidden="true">
+                      <ArrowRight size={14} strokeWidth={2} />
+                    </span>
                   ) : null}
-                </div>
+                  {index === 1 ? (
+                    <span className="path__arrow path__arrow--down" aria-hidden="true">
+                      <ArrowDown size={14} strokeWidth={2} />
+                    </span>
+                  ) : null}
+                </figure>
                 <div className="path__copy">
                   <span className="path__num">{step.num}</span>
                   <h3>{step.title}</h3>
