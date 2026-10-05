@@ -133,6 +133,49 @@ const partners = [
   { name: 'Barista Line', logo: '/assets/partners/barista-line.png', fit: 'wide' },
 ] as const
 
+const coffeePath = [
+  {
+    id: 'harvest',
+    num: '01',
+    title: 'Урожай',
+    text: 'Кофейная ягода начинает свой путь здесь.',
+    image: '/assets/journey/harvest.jpg',
+    alt: 'Сбор спелой кофейной ягоды',
+  },
+  {
+    id: 'dry',
+    num: '02',
+    title: 'Сушка и обработка',
+    text: 'После сбора кофе проходит обработку и сушится.',
+    image: '/assets/journey/dry.jpg',
+    alt: 'Сушка кофейного зерна на патио',
+  },
+  {
+    id: 'roast',
+    num: '03',
+    title: 'Обжарка',
+    text: 'Зелёное зерно превращается в кофе с характером.',
+    image: '/assets/journey/roast.jpg',
+    alt: 'Зерно остывает после обжарки',
+  },
+  {
+    id: 'ship',
+    num: '04',
+    title: 'Доставка',
+    text: 'Готовый кофе отправляется к нам.',
+    image: '/assets/coffee-ingresso-offer.jpg',
+    alt: 'Упаковки кофе Ingresso',
+  },
+  {
+    id: 'cup',
+    num: '05',
+    title: 'Эспрессо',
+    text: 'И наконец — кофе оказывается в чашке.',
+    image: '/assets/journey/cup.jpg',
+    alt: 'Два эспрессо под группой кофемашины',
+  },
+] as const
+
 const reviews = [
   {
     id: 'smena',
@@ -1061,31 +1104,54 @@ function HomeView({
       </section>
 
       <section className="partners" id="partners">
-        <div className="section-heading" data-reveal>
-          <div>
-            <p className="eyebrow">03 / Партнёры</p>
-            <h2>
-              Бренды, с которыми
-              <br />
-              <em>работаем</em>
-            </h2>
-          </div>
-          <p>
-            Обжарка, машины, кофемолки и химия — марки, на которых собираем
-            бар.
-          </p>
+        <div className="partners__brands" data-reveal>
+          <p className="eyebrow">03 / Партнёры</p>
+          <h2>
+            Бренды,
+            <br />
+            с которыми
+            <br />
+            <em>работаем</em>
+          </h2>
+          <ul className="partners__list">
+            {partners.map((partner) => (
+              <li key={partner.name}>
+                <img
+                  className={`partners__logo partners__logo--${partner.fit}`}
+                  src={partner.logo}
+                  alt={partner.name}
+                />
+              </li>
+            ))}
+          </ul>
         </div>
-        <ul className="partners__grid" data-reveal>
-          {partners.map((partner) => (
-            <li key={partner.name}>
-              <img
-                className={`partners__logo partners__logo--${partner.fit}`}
-                src={partner.logo}
-                alt={partner.name}
-              />
-            </li>
-          ))}
-        </ul>
+
+        <div className="partners__journey" data-reveal>
+          <div className="partners__journey-head">
+            <h2>Путь, который проходит кофе</h2>
+            <p>
+              От кофейной ягоды до чашки — показываем путь, который проходит
+              кофе.
+            </p>
+          </div>
+          <ol className="journey">
+            {coffeePath.map((step) => (
+              <li
+                key={step.id}
+                className={`journey__step journey__step--${step.id}`}
+              >
+                <figure className="journey__photo">
+                  <img src={step.image} alt={step.alt} />
+                </figure>
+                <div className="journey__copy">
+                  <span className="journey__num">{step.num}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.text}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
       <ReviewsPanel />
