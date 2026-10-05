@@ -995,6 +995,17 @@ function ProductModal({
   )
 }
 
+function PathArrow({ className }: { className: string }) {
+  return (
+    <span className={`path__bridge ${className}`} aria-hidden="true">
+      <span className="path__bridge-mark">
+        <span className="path__bridge-shaft" />
+        <span className="path__bridge-head" />
+      </span>
+    </span>
+  )
+}
+
 function HomeView({
   onOpen,
   onBuy,
@@ -1138,8 +1149,8 @@ function HomeView({
                 </li>
               ))}
             </ol>
-            <span className="path__bridge path__bridge--to-ship" aria-hidden="true" />
-            <span className="path__bridge path__bridge--to-cup" aria-hidden="true" />
+            <PathArrow className="path__bridge--to-ship" />
+            <PathArrow className="path__bridge--to-cup" />
           </div>
         </div>
       </section>

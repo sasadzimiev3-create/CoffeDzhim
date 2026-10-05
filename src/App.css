@@ -1297,7 +1297,7 @@ main {
 }
 
 .path__photo--cup img {
-  object-position: center 36%;
+  object-position: center 50%;
 }
 
 .path__copy {
@@ -1332,40 +1332,36 @@ main {
 }
 
 .path__bridge {
-  position: relative;
-  z-index: 1;
+  display: grid;
+  place-items: center;
   align-self: stretch;
+  color: var(--copper);
 }
 
 .path__bridge--to-ship { grid-area: to-ship; }
 .path__bridge--to-cup { grid-area: to-cup; }
 
-.path__bridge::before,
-.path__bridge::after {
-  position: absolute;
-  content: '';
+.path__bridge-mark {
+  display: flex;
+  align-items: center;
+  width: calc(100% - 22px);
 }
 
-.path__bridge--to-ship::before,
-.path__bridge--to-cup::before {
-  top: 50%;
-  right: 14px;
-  left: -12px;
-  height: 2px;
-  background: var(--copper);
-  transform: translateY(-50%);
+.path__bridge-shaft {
+  flex: 1 1 auto;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
 }
 
-.path__bridge--to-ship::after,
-.path__bridge--to-cup::after {
-  top: 50%;
-  right: -2px;
-  width: 11px;
-  height: 11px;
-  margin-top: -6px;
-  border-top: 2px solid var(--copper);
-  border-right: 2px solid var(--copper);
-  transform: rotate(45deg);
+.path__bridge-head {
+  flex: none;
+  width: 0;
+  height: 0;
+  margin-left: -1px;
+  border-top: 4.5px solid transparent;
+  border-bottom: 4.5px solid transparent;
+  border-left: 8px solid currentColor;
 }
 
 /* ---------- Reviews ---------- */
@@ -2810,36 +2806,16 @@ html:has(body.modal-open),
   }
 
   .path__photo {
-    aspect-ratio: 3 / 4;
+    aspect-ratio: 2 / 3;
   }
 
   .path__bridge {
-    height: 64px;
+    height: 72px;
   }
 
-  .path__bridge--to-ship::before,
-  .path__bridge--to-cup::before {
-    top: -8px;
-    right: auto;
-    bottom: 16px;
-    left: 50%;
-    width: 2px;
-    height: auto;
-    background: var(--copper);
-    transform: translateX(-50%);
-  }
-
-  .path__bridge--to-ship::after,
-  .path__bridge--to-cup::after {
-    top: auto;
-    right: auto;
-    bottom: 0;
-    left: 50%;
-    margin: 0 0 0 -7px;
-    border: 0;
-    border-right: 2px solid var(--copper);
-    border-bottom: 2px solid var(--copper);
-    transform: rotate(45deg);
+  .path__bridge-mark {
+    width: 54px;
+    transform: rotate(90deg);
   }
 }
 
