@@ -643,8 +643,10 @@ main {
   background:
     linear-gradient(
       180deg,
-      rgba(244, 238, 230, 0.34) 0%,
-      rgba(244, 238, 230, 0.1) 18%,
+      rgba(244, 238, 230, 0.97) 0%,
+      rgba(244, 238, 230, 0.94) 18%,
+      rgba(244, 238, 230, 0.58) 34%,
+      rgba(244, 238, 230, 0.14) 50%,
       rgba(244, 238, 230, 0.06) 100%
     ),
     url('/assets/catalog-shelf.png') center 64% / cover no-repeat;
@@ -660,21 +662,25 @@ main {
 }
 
 .catalog-index .section-heading h2,
+.catalog-index .section-heading .eyebrow,
+.catalog-index .section-heading > p {
+  text-shadow: none;
+}
+
+.catalog-index .section-heading h2 {
+  color: var(--ink);
+}
+
+.catalog-index .section-heading h2 em {
+  color: var(--copper);
+}
+
 .catalog-index .section-heading .eyebrow {
-  text-shadow:
-    -1px -1px 0 #000,
-    0 -1px 0 #000,
-    1px -1px 0 #000,
-    -1px 0 0 #000,
-    1px 0 0 #000,
-    -1px 1px 0 #000,
-    0 1px 0 #000,
-    1px 1px 0 #000,
-    0 0 12px rgba(0, 0, 0, 0.85);
+  color: var(--copper);
 }
 
 .catalog-index .section-heading > p {
-  text-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
+  color: var(--cocoa);
 }
 
 .catalog-index .category-nav__item {
