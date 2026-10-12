@@ -660,9 +660,21 @@ main {
 }
 
 .catalog-index .section-heading h2,
-.catalog-index .section-heading > p,
 .catalog-index .section-heading .eyebrow {
-  text-shadow: 0 0 16px rgba(244, 238, 230, 0.9);
+  text-shadow:
+    -1px -1px 0 #000,
+    0 -1px 0 #000,
+    1px -1px 0 #000,
+    -1px 0 0 #000,
+    1px 0 0 #000,
+    -1px 1px 0 #000,
+    0 1px 0 #000,
+    1px 1px 0 #000,
+    0 0 12px rgba(0, 0, 0, 0.85);
+}
+
+.catalog-index .section-heading > p {
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.75);
 }
 
 .catalog-index .category-nav__item {
@@ -813,6 +825,7 @@ main {
   gap: 12px;
   overflow: hidden;
   background: var(--cream);
+  opacity: 0.78;
   transition:
     transform 280ms ease,
     border-color 280ms ease,
@@ -925,10 +938,6 @@ main {
   max-height: 78%;
   aspect-ratio: 1;
   filter: drop-shadow(0 16px 18px rgba(42, 28, 18, 0.14));
-}
-
-.category-nav__item--soon {
-  opacity: 0.78;
 }
 
 .category-nav__item--soon .category-nav__count {
