@@ -9,6 +9,8 @@ export type LeadPayload = {
   serviceType?: string
   product?: string
   priceLabel?: string
+  consent: boolean
+  consentVersion: string
 }
 
 export async function sendLead(payload: LeadPayload) {

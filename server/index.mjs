@@ -1,4 +1,5 @@
 import { createServer } from 'node:http'
+import { readFileSync } from 'node:fs'
 import { mkdir, readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -6,12 +7,37 @@ import { fileURLToPath } from 'node:url'
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const DIST = path.join(ROOT, 'dist')
 const DATA_DIR = path.join(ROOT, 'server', 'data')
-const STORE_PATH = path.join(DATA_DIR, 'store.json')
 
-const TOKEN =
-  process.env.TELEGRAM_BOT_TOKEN ||
-  '8601211597:AAHwRuHhYZieErptyjuFoT_SI6pttXBEhUM'
-const PASSWORD = process.env.BOT_PASSWORD || '1234'
+function loadEnvFile() {
+  let raw
+  try {
+    raw = readFileSync(path.join(ROOT, '.env'), 'utf8')
+  } catch {
+    return
+  }
+  for (const line of raw.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+    const eq = trimmed.indexOf('=')
+    if (eq <= 0) continue
+    const key = trimmed.slice(0, eq).trim()
+    let value = trimmed.slice(eq + 1).trim()
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1)
+    }
+    if (!process.env[key]) process.env[key] = value
+  }
+}
+
+loadEnvFile()
+
+const STORE_PATH = process.env.LEAD_STORE_PATH || path.join(DATA_DIR, 'store.json')
+const TOKEN = process.env.TELEGRAM_BOT_TOKEN || ''
+const PASSWORD = process.env.BOT_PASSWORD || ''
+const CONSENT_VERSION = '2026-10-22'
 const PORT = Number(process.env.PORT || 8787)
 const HOST = process.env.HOST || '127.0.0.1'
 const TIME_ZONE = 'Europe/Moscow'
@@ -70,6 +96,8 @@ const hits = new Map()
  *   product: string,
  *   priceLabel: string,
  *   status: 'new' | 'in_progress' | 'done',
+ *   consentAt: string,
+ *   consentVersion: string,
  * }} Lead
  */
 
@@ -456,6 +484,9 @@ function parseLead(body) {
   const product = clip(body.product, 160)
   const priceLabel = clip(body.priceLabel, 40)
 
+  if (body.consent !== true || body.consentVersion !== CONSENT_VERSION) {
+    return { error: 'Нужно согласие на обработку персональных данных' }
+  }
   if (name.length < 2) return { error: 'Укажите имя' }
   if (digitsPhone(phone).length < 10) return { error: 'Укажите телефон' }
   if (source === 'purchase' && product.length < 2) {
@@ -475,19 +506,30 @@ function parseLead(body) {
       product: source === 'purchase' ? product : '',
       priceLabel: source === 'purchase' ? priceLabel : '',
       status: 'new',
+      consentAt: new Date().toISOString(),
+      consentVersion: CONSENT_VERSION,
     },
+  }
+}
+
+function securityHeaders(extra = {}) {
+  return {
+    'X-Content-Type-Options': 'nosniff',
+    'Referrer-Policy': 'strict-origin-when-cross-origin',
+    'X-Frame-Options': 'SAMEORIGIN',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    ...extra,
   }
 }
 
 function sendJson(res, status, payload) {
   const body = Buffer.from(JSON.stringify(payload))
-  res.writeHead(status, {
+  res.writeHead(status, securityHeaders({
     'Content-Type': 'application/json; charset=utf-8',
     'Content-Length': body.length,
-    'Access-Control-Allow-Origin': '*',
     'Cache-Control': 'no-store',
     Connection: 'close',
-  })
+  }))
   res.end(body)
 }
 
@@ -511,11 +553,9 @@ function readBody(req, limit = 32_000) {
 
 async function handleLeadRequest(req, res) {
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type',
-    })
+    res.writeHead(204, securityHeaders({
+      'Allow': 'POST, OPTIONS',
+    }))
     res.end()
     return
   }
@@ -560,13 +600,12 @@ async function serveStatic(req, res) {
   }
   try {
     const data = await readFile(file)
-    res.writeHead(200, {
+    res.writeHead(200, securityHeaders({
       'Content-Type': MIME[path.extname(file)] || 'application/octet-stream',
       'Content-Length': data.length,
-      'Access-Control-Allow-Origin': '*',
       'Cache-Control': 'public, max-age=300',
       Connection: 'close',
-    })
+    }))
     res.end(data)
   } catch {
     res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8', Connection: 'close' })
@@ -582,12 +621,7 @@ const server = createServer(async (req, res) => {
       return
     }
     if (urlPath === '/api/health') {
-      sendJson(res, 200, {
-        ok: true,
-        bot: 'coffedzhimbot',
-        managers: store.subscribers.length,
-        leads: store.leads.length,
-      })
+      sendJson(res, 200, { ok: true })
       return
     }
     await serveStatic(req, res)
@@ -634,6 +668,14 @@ async function pollTelegram() {
       await sleep(2000)
     }
   }
+}
+
+if (!TOKEN || !PASSWORD) {
+  console.error('Set TELEGRAM_BOT_TOKEN and BOT_PASSWORD in the environment or in .env')
+  process.exit(1)
+}
+if (PASSWORD.length < 8) {
+  console.warn('BOT_PASSWORD is shorter than 8 characters. Replace it with a longer password.')
 }
 
 await loadStore()

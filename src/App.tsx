@@ -37,6 +37,8 @@ import {
   type SocialNetwork,
 } from './data/site'
 import { sendLead, type LeadSource } from './lib/leads'
+import { CONSENT_VERSION } from './data/legal'
+import { ConsentField, LegalView, PrivacyNotice } from './Legal'
 
 type View =
   | 'home'
@@ -47,6 +49,8 @@ type View =
   | 'equipment'
   | 'service'
   | 'contacts'
+  | 'privacy'
+  | 'consent'
 
 const views: View[] = [
   'home',
@@ -268,22 +272,13 @@ const promoSlides = [
 
 function getViewFromHash(): View {
   const hash = window.location.hash.replace('#', '')
+  if (hash === 'privacy' || hash === 'consent') return hash
   if (hash === 'service-request' || hash === 'service-page') return 'service'
   if (hash === 'contacts-page') return 'contacts'
   return views.includes(hash as View) ? (hash as View) : 'home'
 }
 
 function SocialIcon({ network }: { network: SocialNetwork }) {
-  if (network === 'instagram') {
-    return (
-      <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-        <path
-          fill="currentColor"
-          d="M8 3h8a5 5 0 0 1 5 5v8a5 5 0 0 1-5 5H8a5 5 0 0 1-5-5V8a5 5 0 0 1 5-5Zm0 2a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h8a3 3 0 0 0 3-3V8a3 3 0 0 0-3-3H8Zm8.2 1.6a1.1 1.1 0 1 1 0 2.2 1.1 1.1 0 0 1 0-2.2ZM12 8.2A3.8 3.8 0 1 1 8.2 12 3.8 3.8 0 0 1 12 8.2Zm0 2a1.8 1.8 0 1 0 1.8 1.8A1.8 1.8 0 0 0 12 10.2Z"
-        />
-      </svg>
-    )
-  }
   if (network === 'telegram') {
     return (
       <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
@@ -1342,6 +1337,11 @@ function LeadForm({
     const data = new FormData(form)
     setStatus('sending')
     setError('')
+    if (data.get('pdConsent') !== 'on') {
+      setStatus('error')
+      setError('Подтвердите согласие на обработку персональных данных')
+      return
+    }
     try {
       await sendLead({
         source,
@@ -1352,6 +1352,8 @@ function LeadForm({
         serviceType: String(data.get('serviceType') || ''),
         product,
         priceLabel,
+        consent: true,
+        consentVersion: CONSENT_VERSION,
       })
       form.reset()
       setStatus('sent')
@@ -1430,6 +1432,7 @@ function LeadForm({
           }
         />
       </label>
+      <ConsentField />
       <button
         className="button button--dark button--wide"
         type="submit"
@@ -1748,6 +1751,11 @@ function App() {
   }, [])
 
   useEffect(() => {
+    setSelectedProduct(null)
+    setPurchaseRequest(null)
+  }, [view])
+
+  useEffect(() => {
     const hash = window.location.hash.replace('#', '')
     const frame = window.requestAnimationFrame(() => {
       if (hash === 'service-request') {
@@ -1830,6 +1838,9 @@ function App() {
       )}
       {view === 'service' && <ServiceView />}
       {view === 'contacts' && <ContactsView />}
+      {(view === 'privacy' || view === 'consent') && (
+        <LegalView document={view} />
+      )}
 
       <footer className="site-footer">
         <div className="footer-brand">
@@ -1838,6 +1849,10 @@ function App() {
             Сайт для B2B: кофе, оборудование и сервис для кофеен, ресторанов и
             офисов.
           </p>
+          <nav className="footer-legal" aria-label="Документы">
+            <a href="#privacy">Политика обработки персональных данных</a>
+            <a href="#consent">Согласие на обработку персональных данных</a>
+          </nav>
         </div>
         <div className="footer-meta">
           <div className="footer-contacts">
@@ -1877,6 +1892,7 @@ function App() {
           onClose={() => setPurchaseRequest(null)}
         />
       )}
+      {view !== 'privacy' && view !== 'consent' ? <PrivacyNotice /> : null}
     </main>
   )
 }

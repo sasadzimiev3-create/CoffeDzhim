@@ -6,7 +6,7 @@ export const siteContacts = {
   emailHref: 'mailto:dbr1994@yandex.ru',
 }
 
-export type SocialNetwork = 'telegram' | 'instagram' | 'whatsapp'
+export type SocialNetwork = 'telegram' | 'whatsapp'
 
 export type SocialLink = {
   id: SocialNetwork
@@ -16,6 +16,5 @@ export type SocialLink = {
 
 export const siteSocials: SocialLink[] = [
   { id: 'telegram', label: 'Telegram', href: null },
-  { id: 'instagram', label: 'Instagram', href: null },
   { id: 'whatsapp', label: 'WhatsApp', href: 'https://wa.me/79522839932' },
 ]
